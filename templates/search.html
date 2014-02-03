@@ -1,0 +1,13 @@
+$def with ($post, results)
+
+<h1>Search</h1>
+<form action="" method="post">
+$:form.render()
+</form>
+
+$if results != None:
+	$for result in results:
+		<tr>
+			<td>$result[0].titles['en'][0].title</td>
+			<td><a href="/new">Add Anime</a></td>
+		</tr>

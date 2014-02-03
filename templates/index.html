@@ -1,0 +1,16 @@
+$def with (animes)
+
+<h1>Anime</h1>
+
+<ul>
+
+	<li>
+		
+		
+<table border="1">
+$for anime in animes:
+	<tr>
+		<td><a href="/anime/$anime.id">$anime.title</td>
+		<td>$anime.group</td>
+	</tr>
+</table>
