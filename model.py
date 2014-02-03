@@ -12,8 +12,8 @@ def get_anime(id):
     except IndexError:
         return None
 
-def new_anime(id, title, group, quality=0):
-    db.insert('animes', id=id, title=title, quality=quality)
+def new_anime(id, title, subber, quality=0):
+    db.insert('animes', id=id, title=title, subber=subber, quality=quality)
     
 def remove_anime(id):
     db.delete('animes', where='id=$id', vars=locals())
@@ -28,7 +28,7 @@ def update_episode(id, episode, title):
     db.update('episodes', where='id=$id AND episode=$episode', vars=locals(),
         title=title)
 
-def new_episode(id, title, episode):
+def new_episode(id, episode, title=None):
     db.insert('episodes', id=id, title=title, episode=episode, snatched=0)
     
 def get_episodes(id):
@@ -39,3 +39,17 @@ def get_episodes(id):
 
 def remove_episode(id, episode):
     db.delete(episodes, where='id=$id AND episode=$episode', vars=locals())
+    
+def update_settings(url, key, category=None, username=None, password=None):
+    try:
+        settings = db.select('SABnzbd', vars=locals())[0]
+        # Updating doesn't work
+        db.update('SABnzbd', where='url=$url', vars=locals(), url=url, key=key, category=category, username=username, password=password)
+    except IndexError:
+        db.insert('SABnzbd', url=url, key=key, category=category, username=username, password=password)
+        
+def get_settings():
+    try:
+        return db.select('SABnzbd', vars=locals())[0]
+    except IndexError:
+        return None

@@ -9,7 +9,16 @@ $:form.render()
 $if results != None:
 	$for result in results:
 		<tr>
-			<td>$result.titles['x-jat'][0].title</td>
-			<td><a href="/new">Add Anime</a></td>
+			$if result.titles.has_key('en'):
+				$if result.titles.has_key('x-jat'):
+					<td>$result.titles['en'][0].title ($result.titles['x-jat'][0].title)</td>
+				$else:
+					<td>$result.titles['en'][0].title</td>
+			$else:
+				$if result.titles.has_key('x-jat'):
+					<td>$result.titles['x-jat'][0].title</td>
+				$else:
+					<td>Fail</td>
+			<td><a href="/add/$result.id">Add Anime</a></td>
 		</tr>
 </table>

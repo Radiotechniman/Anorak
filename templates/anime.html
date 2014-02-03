@@ -1,0 +1,16 @@
+$def with (anime, episodes, episodeForm)
+
+<h1>$anime.title</h1>
+</h2>$anime.subber</h2>
+
+<table border="1">
+$for episode in episodes:
+	<tr>
+		<td>$episode.episode</td>
+		<td>$episode.title</td>
+		$if episode.snatched == 1:
+			<td>Snatched</td>
+		$else:
+			<td>Wanted <form action="" method="post">$:episodeForm(episode.episode).render()</form></td>
+	</tr>
+</table>

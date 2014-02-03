@@ -29,7 +29,7 @@ class Titled(object):
         :param title: The title to add
         """
         assert title.lang is not None
-        assert title.title is not None
+        #assert title.title is not None
         if title.lang in self.titles:
             self.titles[title.lang].append(title)
         else:

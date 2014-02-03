@@ -1,7 +1,7 @@
 import lib.web as web
 import lib.anidb as anidb
-import lib.newznab_python_wrapper as newznab
 import model
+from downloader import *
 #setup database with sqlite3 anorak < schema.sql
 
 urls = (
@@ -9,7 +9,8 @@ urls = (
     '/anime/(\d+)', 'Anime',
 	'/settings', 'Settings',
     '/search', 'Search',
-	'/new', 'New',
+	'/new/(\d+)', 'New',
+    '/add/(\d+)', 'Add',
 	'/remove/(\d+)', 'Remove',
 )
 
@@ -33,15 +34,62 @@ class Index:
 
 class Anime:
     
+    def episodeForm(self,episode=None):
+        return web.form.Form(
+            web.form.Hidden('episode', value=episode),
+            web.form.Button('Try'),
+        )
+    
     def GET(self, id):
         """ List anime episodes """
+        anime = model.get_anime(id)
         episodes = model.get_episodes(id)
-        return render.anime(episodes)
+        episodeForm = self.episodeForm
+        return render.anime(anime, episodes, episodeForm)
+        
+    def POST(self, id):
+        anime = model.get_anime(id)
+        downloader = Downloader()
+        downloader.anime = anime.title
+        downloader.group = anime.subber
+        downloader.episode = web.input().episode
+        if (downloader.download()):
+            return "Snatched successfully"
+        else:
+            return "Couldn't snatch"
+        
+class Add:
+    
+    form = web.form.Form(
+        web.form.Textbox('subber', web.form.notnull,
+        size=30,
+        description="Enter the release group"),
+        web.form.Button('Complete Add'),
+    )
+    
+    anime = None
+    
+    def GET(self, id):
+        """ Show the groups doing releases / Actually shows a lame number of episode list without titles """
+        form = self.form()
+        anime = anidb.query(anidb.QUERY_ANIME, int(id))
+        return render.add(form, anime)
+    
+    def POST(self, id):
+        form = self.form()
+        anime = anidb.query(anidb.QUERY_ANIME, int(id))
+        if not form.validates():
+            return render.add(form, anime)
+        model.new_anime(anime.id, anime.titles['x-jat'][0].title, form.d.subber, quality=0)
+        for i in xrange(anime.episodecount):
+            model.new_episode(anime.id, i, "Episode "+str(i))
+        raise web.seeother('/')
         
 class New:
     
-    def POST(self):
+    def POST(self, id):
         # process anime here, populate episodes table with info from anidb
+        model.new_anime(id, title, group, quality=0)
         return render.new(title)
 
 class Search:
@@ -63,6 +111,65 @@ class Search:
             return render.search(form, None)
         results = anidb.search(form.d.query)
         return render.search(form, results)
+        
+class FakeSettings:
+    def __init__(self):
+        self.url=None
+        self.port=None
+        self.key=None
+        self.category=None
+        
+class Settings:
+    settings = model.get_settings()
+    if (settings==None):
+        settings = FakeSettings()
+    
+    form = web.form.Form(
+        web.form.Textbox('url', web.form.notnull,
+        size=30,
+        value=settings.url,
+        description="SABnzbd URL:"),
+        web.form.Textbox('key', web.form.notnull,
+        size=30,
+        value=settings.key,
+        description="API key:"),
+        web.form.Textbox('category', web.form.notnull,
+        size=30,
+        value=settings.category,
+        description="Category:"),
+        web.form.Button('Update'),
+    )
+    
+    def GET(self):
+        #reload settings after page settings load
+        settings = model.get_settings()
+        if (settings==None):
+            settings = FakeSettings()
+    
+        form = web.form.Form(
+            web.form.Textbox('url', web.form.notnull,
+            size=30,
+            value=settings.url,
+            description="SABnzbd URL:"),
+            web.form.Textbox('key', web.form.notnull,
+            size=30,
+            value=settings.key,
+            description="API key:"),
+            web.form.Textbox('category', web.form.notnull,
+            size=30,
+            value=settings.category,
+            description="Category:"),
+            web.form.Button('Update'),
+        )
+        return render.settings(form)
+    
+    def POST(self):
+        form = self.form()
+        if not form.validates():
+            return render.settings(form)
+        model.update_settings(form.d.url, form.d.key, form.d.category)
+        return render.settings(form)
+            
 
 app = web.application(urls, globals())
 
