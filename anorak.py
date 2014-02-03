@@ -2,6 +2,7 @@ import lib.web as web
 import lib.anidb as anidb
 import lib.newznab_python_wrapper as newznab
 import model
+#setup database with sqlite3 anorak < schema.sql
 
 urls = (
 	'/', 'Index',
@@ -59,9 +60,9 @@ class Search:
     def POST(self):
         form = self.form()
         if not form.validates():
-            return render.new(form, None)
+            return render.search(form, None)
         results = anidb.search(form.d.query)
-        render.new(results, results)
+        return render.search(form, results)
 
 app = web.application(urls, globals())
 
