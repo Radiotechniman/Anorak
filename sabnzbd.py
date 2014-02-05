@@ -35,7 +35,8 @@ def SABnzbd(title=None, nzburl=None):
 #    if settings.preprocessor:
 #        params["script"] = settings.script
 
-    URL = HOST + "/api?" + urllib.urlencode(params) 
+    # Note: If the url doesn't contain a slash at the end this won't work
+    URL = HOST + "api?" + urllib.urlencode(params) 
 
     # to debug because of api
     print('Request url for <a href="%s">SABnzbd</a>' % URL)
@@ -57,7 +58,7 @@ def SABnzbd(title=None, nzburl=None):
         print("SABnzbd didn't return anything.")
         return False
 
-    logger.debug("Result text from SAB: " + result)
+    print("Result text from SAB: " + result)
     if result == "ok":
         print(title + " sent to SAB successfully.")
         return True

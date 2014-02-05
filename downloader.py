@@ -2,6 +2,7 @@ import fanzub
 import sabnzbd
 
 class Downloader:
+    
     def __init__(self):
         self.anime = None
         self.episode = None

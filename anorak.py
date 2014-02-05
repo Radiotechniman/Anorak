@@ -54,6 +54,7 @@ class Anime:
         downloader.group = anime.subber
         downloader.episode = web.input().episode
         if (downloader.download()):
+            model.snatched_episode(id, web.input().episode)
             return "Snatched successfully"
         else:
             return "Couldn't snatch"
@@ -93,6 +94,7 @@ class New:
         return render.new(title)
 
 class Search:
+    
     form = web.form.Form(
         web.form.Textbox('query', web.form.notnull,
         size=30,
@@ -113,6 +115,7 @@ class Search:
         return render.search(form, results)
         
 class FakeSettings:
+    
     def __init__(self):
         self.url=None
         self.port=None
@@ -120,8 +123,11 @@ class FakeSettings:
         self.category=None
         
 class Settings:
+    
     settings = model.get_settings()
     if (settings==None):
+        # If we can't get the settings it will return a None type object.
+        # FakeSettings replaces None an object with blank properties.
         settings = FakeSettings()
     
     form = web.form.Form(
