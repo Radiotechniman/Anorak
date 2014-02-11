@@ -16,7 +16,9 @@ urls = (
 
 ### Templates
 t_globals = {
-	'datestr': web.datestr
+	'datestr': web.datestr,
+    'str': str,
+    'len': len
 }
 
 #web.config.debug = False
@@ -83,7 +85,10 @@ class Add:
             return render.add(form, anime)
         model.new_anime(anime.id, anime.titles['x-jat'][0].title, form.d.subber, quality=0)
         for i in xrange(anime.episodecount):
-            model.new_episode(anime.id, i, "Episode "+str(i))
+            if anime.episodes.has_key(str(i+1)):
+                model.new_episode(anime.id, i, anime.episodes[str(i+1)].titles['en'][0].title)
+            else:
+                model.new_episode(anime.id, i, "Episode "+str(i))
         raise web.seeother('/')
         
 class New:
@@ -175,7 +180,6 @@ class Settings:
             return render.settings(form)
         model.update_settings(form.d.url, form.d.key, form.d.category)
         return render.settings(form)
-            
 
 app = web.application(urls, globals())
 

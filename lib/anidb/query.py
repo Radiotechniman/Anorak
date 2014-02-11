@@ -66,9 +66,9 @@ def query(type=QUERY_ANIME, aid=None, **kwargs):
         if aid is None:
             raise TypeError("aid can't be None")
         else:
-            #cacheresult = cache.get(aid)
-            #if cacheresult is not None:
-            #    return cacheresult
+            cacheresult = cache.get(aid)
+            if cacheresult is not None:
+                return cacheresult
                 
             #print ANIDB_URL % (CLIENT, CLIENTVERSION, "anime") + "&aid=%i" % aid
 

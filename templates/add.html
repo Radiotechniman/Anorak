@@ -16,7 +16,11 @@ $:form.render()
 <table border="1">
 $for i in xrange(anime.episodecount):
 	<tr>
-		<td>Episode $i</td>
+        <td>$(i+1)</td>
+        $if anime.episodes.has_key(str(i+1)):
+            <td>$anime.episodes[str(i+1)].titles['en'][0].title</td>
+        $else: 
+            <td>Episode $i</td>
 	</tr>
 </table>
 <!-- If we had access to subber groups from AniDB we would list them here in a table -->
