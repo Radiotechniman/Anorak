@@ -4,86 +4,100 @@ $def with (page)
 <head>
 	<title>Anorak</title>
 	<style>
+    @font-face
+    {
+        font-family: animeAce;
+        src: url(static/animeace2_reg.otf);
+    }
+    
+    @font-face
+    {
+        font-family: openSans;
+        src: url(static/OpenSans-Regular.ttf);
+    }
+    
     nav {
-      background-color: LightSkyBlue;
-      height:40px;
+        background-color: LightSkyBlue;
+        height:40px;
     }
  
     nav ul {
-      font-family: Arial, Verdana;
-      font-size: 20px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
+        font-family: openSans;
+        font-size: 20px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
  
     nav ul li {
-      display: block;
-      position: relative;
-      float: left;
- 
+        display: block;
+        position: relative;
+        float: left;
     }
  
     nav li ul { 
-      display: none; 
+        display: none; 
     }
  
     nav ul li a {
-      display: block;
-      text-decoration: none;
-      padding: 7px 15px 3px 15px;
-      background: LightSkyBlue;
-      color: #ffffff;  
-      margin-left: 1px;
-      white-space: nowrap;
-      height:30px; /* Width and height of top-level nav items */
-      width:90px;
-      text-align:center;
- 
+        display: block;
+        text-decoration: none;
+        padding: 7px 15px 3px 15px;
+        background: LightSkyBlue;
+        color: #ffffff;  
+        margin-left: 1px;
+        white-space: nowrap;
+        height:30px; /* Width and height of top-level nav items */
+        width:90px;
+        text-align:center;
+    }
+    
+    #title {
+        font-family:animeAce;
     }
  
     nav ul li a:hover { 
-      background: LightBlue; 
+        background: LightBlue; 
     }
  
     nav li:hover ul {
-      display: block;
-      position: absolute;
-      height:30px;
+        display: block;
+        position: absolute;
+        height:30px;
     }
  
     nav li:hover li {
-      float: none;
-      font-size: 11px;
- 
+        float: none;
+        font-size: 11px;
     }
  
     nav li:hover a { 
-      background: LightBlue; 
-      height:30px; /* Height of lower-level nav items is shorter than main level */
+        background: LightBlue; 
+        height:30px; /* Height of lower-level nav items is shorter than main level */
     }
  
     nav li:hover li a:hover { 
-      background: #D6ECF2; 
+        background: #D6ECF2; 
     }
  
     nav ul li ul li a {
         text-align:left; /* Top-level items are centered, but nested list items are left-aligned */
+    }
+    
+    body {
+        font-family: openSans;
+    }
+    
+    ul {
+        list-style-type:none;
     }
 	</style>
 </head>
 <body>
 	<nav id="menu">
 	    <ul id="menu">
-		    <li><a href="/">Home</a>
-                <ul>
-                            <li><a href="/visites">Site Visits</a></li>
-                            <li><a href="/spot">Spot Welding</a></li>
-                            <li><a href="/tig">TiG Welding</a></li>
-                            <li><a href="/mig">MiG Welding</a></li>
-                            <li><a href="/drain">Drain Service</a></li>
-                        </ul></li>
-            
+            <li><a href="/" id="title">Anorak</a></li>
+		    <li><a href="/">Wanted</a></li>
 		    <li><a href="/search">Search</a></li>
 		    <li><a href="/settings">Settings</a></li>
 	    </ul>
