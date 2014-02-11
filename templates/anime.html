@@ -6,8 +6,9 @@ $def with (anime, episodes, episodeForm)
 <table border="1">
 $for episode in episodes:
 	<tr>
-		<td>$episode.episode</td>
+		<td>$(episode.episode+1)</td>
 		<td>$episode.title</td>
+        <td>$episode.airdate</td>
 		$if episode.snatched == 1:
 			<td>Snatched</td>
 		$else:
