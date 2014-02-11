@@ -24,6 +24,7 @@ t_globals = {
 render = web.template.render('templates', base='base', globals=t_globals)
 
 anidb.set_client('anorakk', 1)
+#anime = anidb.query(anidb.QUERY_ANIME, 3433)
 
 class Index:
     

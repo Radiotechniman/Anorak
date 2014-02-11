@@ -2,7 +2,8 @@
 # TODO parse characters
 import xml.etree.ElementTree as ET
 import requests
-import StringIO
+#import StringIO
+import io as StringIO
 import model
 import cache
 import exceptions
@@ -66,9 +67,11 @@ def query(type=QUERY_ANIME, aid=None, **kwargs):
         if aid is None:
             raise TypeError("aid can't be None")
         else:
-            cacheresult = cache.get(aid)
-            if cacheresult is not None:
-                return cacheresult
+            #cacheresult = cache.get(aid)
+            #if cacheresult is not None:
+            #    return cacheresult
+                
+            #print ANIDB_URL % (CLIENT, CLIENTVERSION, "anime") + "&aid=%i" % aid
 
             response = \
                 requests.get(ANIDB_URL % (CLIENT, CLIENTVERSION, "anime")
@@ -138,6 +141,7 @@ def parse_anime(anime):
         elif elem.tag == "type":
             result.type = elem.text
         elif elem.tag == "startdate":
+            # This doesn't work for anime that don't have a defined airdate yet. It crashes.
             y, m, d = elem.text.split("-")
             result.startdate = datetime.datetime(int(y), int(m), int(d))
         elif elem.tag == "enddate":

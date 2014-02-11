@@ -29,7 +29,7 @@ class Titled(object):
         :param title: The title to add
         """
         assert title.lang is not None
-        #assert title.title is not None
+        assert title.title is not None
         if title.lang in self.titles:
             self.titles[title.lang].append(title)
         else:
@@ -215,7 +215,9 @@ class Episode(Entity, Titled):
 
     def set_rating(self, votes, rating):
         self._rating = (int(votes), float(rating))
-
+        
+    def titles(self):
+        return self.titles
 
     @property
     def epno(self):
