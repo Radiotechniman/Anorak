@@ -2,8 +2,7 @@
 # TODO parse characters
 import xml.etree.ElementTree as ET
 import requests
-#import StringIO
-import io as StringIO
+import StringIO
 import model
 import cache
 import exceptions

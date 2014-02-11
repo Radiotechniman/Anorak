@@ -127,7 +127,7 @@ class Anime(Entity, Titled, Typed, Described):
         :param episode: :class:`anidb.model.Episode`
         """
         if isinstance(episode, Episode):
-            self._episodes[episode.epno] = Episode
+            self._episodes[episode.epno] = episode
         else:
             raise TypeError("Episode expected")
 
@@ -215,9 +215,6 @@ class Episode(Entity, Titled):
 
     def set_rating(self, votes, rating):
         self._rating = (int(votes), float(rating))
-        
-    def titles(self):
-        return self.titles
 
     @property
     def epno(self):
