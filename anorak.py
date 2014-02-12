@@ -90,7 +90,7 @@ class Add:
             if anime.episodes.has_key(str(i+1)):
                 model.new_episode(anime.id, i, anime.episodes[str(i+1)].titles['en'][0].title, anime.episodes[str(i+1)].airdate)
             else:
-                model.new_episode(anime.id, i, "Episode "+str(i))
+                model.new_episode(anime.id, i, "Episode "+str(i+1))
         raise web.seeother('/')
         
 class New:
