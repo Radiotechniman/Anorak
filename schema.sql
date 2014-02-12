@@ -10,7 +10,7 @@ id integer,
 title text,
 episode integer,
 airdate timestamp,
-snatched integer
+wanted integer /*0 is skipped, 1 is wanted, 2 is snatched*/
 );
 
 CREATE TABLE SABnzbd (

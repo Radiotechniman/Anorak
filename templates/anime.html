@@ -20,16 +20,20 @@ $for episode in episodes:
             <td>$episode.airdate.strftime("%Y-%m-%d")</td>
         $else:
             <td>TBD</td>
-        $if episode.snatched == 1:
+        $if episode.wanted == 2:
             <td>Snatched</td>
         $else:
-            $if episode.airdate!=None:
-                $if episode.airdate > datetime.datetime.now():
-                    <td>Unaired</td>
+            $if episode.wanted == 1:
+                $if episode.airdate!=None:
+                    $if episode.airdate > datetime.datetime.now():
+                        <td>Unaired</td>
+                    $else:
+                        <td>Wanted</td>
                 $else:
-                    <td>Wanted</td>
+                    <td>Unaired</td>
             $else:
-                <td>Unaired</td>
+                $if episode.wanted == 0:
+                    <td>Skipped</td>
         <td><form action="" method="post">$:episodeForm(episode.episode).render()</form></td>
 	</tr>
 </table>

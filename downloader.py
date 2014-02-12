@@ -9,6 +9,9 @@ class Downloader:
         self.group = None
     def download(self):
         search = fanzub.search(self.group, self.anime, self.episode)
-        url = search[0].url
-        name = search[0].name
-        return sabnzbd.SABnzbd(name, url)
+        try:
+            url = search[0].url
+            name = search[0].name
+            return sabnzbd.SABnzbd(name, url)
+        except IndexError:
+            return False

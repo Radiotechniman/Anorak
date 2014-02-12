@@ -22,14 +22,14 @@ def remove_anime(id):
     
 def snatched_episode(id, episode):
     db.update('episodes', where='id=$id AND episode=$episode', vars=locals(),
-        snatched=1)
+        wanted=2)
         
 def update_episode(id, episode, title, airdate):
     db.update('episodes', where='id=$id AND episode=$episode', vars=locals(),
         title=title, airdate=airdate)
 
-def new_episode(id, episode, title=None, airdate=None):
-    db.insert('episodes', id=id, airdate=airdate, title=title, episode=episode, snatched=0)
+def new_episode(id, episode, title=None, wanted=None, airdate=None):
+    db.insert('episodes', id=id, airdate=airdate, title=title, episode=episode, wanted=wanted)
     
 def get_episodes(id):
     try:
