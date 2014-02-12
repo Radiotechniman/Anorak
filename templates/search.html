@@ -1,24 +1,31 @@
 $def with (form, results)
+$var title: Search
 
-<h1>Search</h1>
+<h2>Search</h2>
 <form action="" method="post">
 $:form.render()
 </form>
 
-<table border="1">
 $if results != None:
-	$for result in results:
-		<tr>
-			$if result.titles.has_key('en'):
-				$if result.titles.has_key('x-jat'):
-					<td>$result.titles['en'][0].title ($result.titles['x-jat'][0].title)</td>
-				$else:
-					<td>$result.titles['en'][0].title</td>
-			$else:
-				$if result.titles.has_key('x-jat'):
-					<td>$result.titles['x-jat'][0].title</td>
-				$else:
-					<td>Fail</td>
-			<td><a href="/add/$result.id">Add Anime</a></td>
-		</tr>
-</table>
+    <hr/>
+    <br/>
+    <table border="1" width="100%">
+            <tr>
+                <td>Anime</td>
+                <td>Action</td>
+            </tr>
+	    $for result in results:
+	        <tr>
+			    $if result.titles.has_key('en'):
+				    $if result.titles.has_key('x-jat'):
+					    <td>$result.titles['en'][0].title ($result.titles['x-jat'][0].title)</td>
+				    $else:
+					    <td>$result.titles['en'][0].title</td>
+			    $else:
+				    $if result.titles.has_key('x-jat'):
+					    <td>$result.titles['x-jat'][0].title</td>
+				    $else:
+					    <td>Fail</td>
+			    <td><a href="/add/$result.id">Add Anime</a></td>
+		    </tr>
+    </table>

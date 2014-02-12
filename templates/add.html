@@ -1,4 +1,5 @@
 $def with (form, anime)
+$var title = "Add "+anime.titles['en'][0].title+" (" + anime.titles['x-jat'][0].title + ")"
 
 $if anime.titles.has_key('en'):
 	<h1>$anime.titles['en'][0].title ($anime.titles['x-jat'][0].title)</h1>
@@ -13,7 +14,11 @@ $else:
 $:form.render()
 </form>
 
-<table border="1">
+<table border="1" width="100%">
+    <tr>
+        <td>Episode</td>
+        <td>Title</td>
+    </tr>
 $for i in xrange(anime.episodecount):
 	<tr>
         <td>$(i+1)</td>
