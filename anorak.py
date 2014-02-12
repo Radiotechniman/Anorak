@@ -1,6 +1,7 @@
 import lib.web as web
 import lib.anidb as anidb
 import model
+import datetime
 from downloader import *
 #setup database with sqlite3 anorak < schema.sql
 
@@ -18,7 +19,8 @@ urls = (
 t_globals = {
 	'datestr': web.datestr,
     'str': str,
-    'len': len
+    'len': len,
+    'datetime': datetime
 }
 
 #web.config.debug = False
@@ -86,7 +88,7 @@ class Add:
         model.new_anime(anime.id, anime.titles['x-jat'][0].title, form.d.subber, quality=0)
         for i in xrange(anime.episodecount):
             if anime.episodes.has_key(str(i+1)):
-                model.new_episode(anime.id, i, anime.episodes[str(i+1)].titles['en'][0].title)
+                model.new_episode(anime.id, i, anime.episodes[str(i+1)].titles['en'][0].title, anime.episodes[str(i+1)].airdate)
             else:
                 model.new_episode(anime.id, i, "Episode "+str(i))
         raise web.seeother('/')

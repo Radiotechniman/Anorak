@@ -9,6 +9,7 @@ CREATE TABLE episodes (
 id integer,
 title text,
 episode integer,
+airdate timestamp,
 snatched integer
 );
 

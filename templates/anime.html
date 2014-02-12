@@ -3,15 +3,32 @@ $def with (anime, episodes, episodeForm)
 <h1>$anime.title</h1>
 </h2>$anime.subber</h2>
 
-<table border="1">
+<table border="1" width="100%">
+    <tr>
+        <td>Episode</td>
+        <td>Title</td>
+        <td>Airdate</td>
+        <td>Status</td>
+        <td>Search</td>
+    </tr>
 $for episode in episodes:
 	<tr>
 		<td>$(episode.episode+1)</td>
 		<td>$episode.title</td>
-        <td>$episode.airdate</td>
-		$if episode.snatched == 1:
-			<td>Snatched</td>
-		$else:
-			<td>Wanted <form action="" method="post">$:episodeForm(episode.episode).render()</form></td>
+        $if episode.airdate!=None:
+            <td>$episode.airdate.strftime("%Y-%m-%d")</td>
+        $else:
+            <td>TBD</td>
+        $if episode.snatched == 1:
+            <td>Snatched</td>
+        $else:
+            $if episode.airdate!=None:
+                $if episode.airdate > datetime.datetime.now():
+                    <td>Unaired</td>
+                $else:
+                    <td>Wanted</td>
+            $else:
+                <td>Unaired</td>
+        <td><form action="" method="post">$:episodeForm(episode.episode).render()</form></td>
 	</tr>
 </table>
