@@ -85,11 +85,45 @@ $def with (page)
     }
     
     body {
-        font-family: openSans;
+        font-family:openSans;
     }
     
     ul {
         list-style-type:none;
+    }
+    
+    #search textarea:focus, input:focus{
+        outline: 0;
+    }
+    
+    #search input[type='text'] 
+    {
+        margin-top:0px;
+        margin-left:0px;
+        font-family:openSans;
+        font-size:20px;
+        border:none;
+    	background-color:LightBlue;
+    	color:White;
+        height:40px;
+    }
+    
+    #search button {
+        position:relative; 
+    	left:-6px;
+        top:-1px;
+        border:none;
+        height:40px;
+        font-size:20px;
+        width:120px;
+        font-family:openSans;
+    	background:LightSkyBlue;
+    	color:White;
+    	cursor:pointer;
+    }
+    
+    #search button:hover {
+        background:LightBlue;
     }
 	</style>
 </head>
@@ -98,8 +132,11 @@ $def with (page)
 	    <ul id="menu">
             <li><a href="/" id="title">Anorak</a></li>
 		    <li><a href="/">Home</a></li>
-		    <li><a href="/search">Search</a></li>
+		    <!--<li><a href="/search">Search</a></li>-->
 		    <li><a href="/settings">Settings</a></li>
+            <li id="search">
+                <form action="/search" method="post">$:searchForm.query.render()$:searchForm.Search.render()</form>
+            </li>
 	    </ul>
     </nav>
 	

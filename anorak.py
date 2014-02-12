@@ -15,12 +15,23 @@ urls = (
 	'/remove/(\d+)', 'Remove',
 )
 
+searchForm = web.form.Form(
+        web.form.Textbox('query',
+        size=15,
+        height="100%",
+        description="",
+        id="search"),
+        web.form.Button('Search', 
+        id="search_button"),
+    )
+
 ### Templates
 t_globals = {
 	'datestr': web.datestr,
     'str': str,
     'len': len,
-    'datetime': datetime
+    'datetime': datetime,
+    'searchForm': searchForm
 }
 
 #web.config.debug = False
@@ -102,24 +113,25 @@ class New:
 
 class Search:
     
-    form = web.form.Form(
+    """form = web.form.Form(
         web.form.Textbox('query', web.form.notnull,
         size=30,
         description=""),
         web.form.Button('Search'),
-    )
+    )"""
     
     def GET(self):
         """ Search for Anime and add it """
-        form = self.form()
-        return render.search(form, None)
+        #form = self.form()
+        return render.search(searchForm, None)
         
     def POST(self):
-        form = self.form()
-        if not form.validates():
-            return render.search(form, None)
-        results = anidb.search(form.d.query)
-        return render.search(form, results)
+        #form = self.form()
+        if not searchForm.validates():
+            return render.search(searchForm, None)
+        results = anidb.search(searchForm.d.query)
+        searchForm.d.query = ""
+        return render.search(searchForm, results)
         
 class FakeSettings:
     
