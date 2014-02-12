@@ -1,16 +1,20 @@
 $def with (animes)
 
-<h1>Anime</h1>
-
-<ul>
-
-	<li>
-		
-		
-<table border="1">
-$for anime in animes:
-	<tr>
-		<td><a href="/anime/$anime.id">$anime.title</td>
-		<td>$anime.subber</td>
-	</tr>
+<h2>Show List</h2>		
+<hr>
+<br/>
+$code: anime_list = list(animes) #This is a hack since IterBetter can only read through the list once.
+$if len(anime_list) > 0:
+    <table border="1" width="100%">
+        <tr>
+            <td>Anime</td>
+            <td>Group</td>
+        </tr>
+    $for anime in anime_list:
+	    <tr>
+	        <td><a href="/anime/$anime.id">$anime.title</td>
+	            <td>$anime.subber</td>
+	    </tr>
+$else:
+    <h3>There's nothing here. Add some shows.</h3>
 </table>
