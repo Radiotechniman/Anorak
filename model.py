@@ -1,7 +1,7 @@
 import lib.web as web
 import datetime
 
-db = web.database(dbn='sqlite', db='anorak')
+db = web.database(dbn='sqlite', db='anorak.db')
 
 def get_animes():
     return db.select('animes', order='title DESC')

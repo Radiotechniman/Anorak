@@ -5,6 +5,18 @@ import datetime
 import search
 from downloader import *
 #setup database with sqlite3 anorak < schema.sql
+"""
+Setup database from some sort of wizard
+import os
+if not os.path.exists('anorak.db'):
+    import sqlite3
+    conn = sqlite3.connect('anorak.db')
+    c = conn.cursor()
+    schema = open('schema.sql', 'r').read()
+    c.execute(schema)
+    conn.commit()
+    c.close()
+"""
 
 urls = (
 	'/', 'Index',
@@ -87,7 +99,7 @@ class Add:
     anime = None
     
     def GET(self, id):
-        """ Show the groups doing releases / Actually shows a lame number of episode list without titles """
+        """ Show the groups doing releases (UDP only feature, we're using TCP) """
         form = self.form()
         anime = anidb.query(anidb.QUERY_ANIME, int(id))
         return render.add(form, anime)
@@ -115,6 +127,11 @@ class Add:
                 # This episode is so far in the future it doesn't even have any information! It must be unaired. Mark as wanted. We'll definitely want to refresh the metadata at a later date for this one!
                 model.new_episode(anime.id, i, "Episode "+str(i+1), 1)
         raise web.seeother('/')
+        
+class Remove:
+    def GET(self, id):
+        #model.remove_anime(id)
+        return "Anime %s removed from database" % id
         
 class New:
     
