@@ -11,6 +11,12 @@ def get_anime(id):
         return db.select('animes', where='id=$id', vars=locals())[0]
     except IndexError:
         return None
+        
+def get_anime_by_title(title):
+    try:
+        return db.query("SELECT * FROM animes WHERE LOWER(title)=LOWER(\'%s\')" % title)[0]
+    except IndexError:
+        return None
 
 def new_anime(id, title, subber, quality=0):
     db.insert('animes', id=id, title=title, subber=subber, quality=quality)
@@ -23,6 +29,10 @@ def remove_anime(id):
 def snatched_episode(id, episode):
     db.update('episodes', where='id=$id AND episode=$episode', vars=locals(),
         wanted=2)
+
+def downloaded_episode(id, episode):
+    db.update('episodes', where='id=$id AND episode=$episode', vars=locals(),
+        wanted=3)
         
 def update_episode(id, episode, title, airdate):
     db.update('episodes', where='id=$id AND episode=$episode', vars=locals(),

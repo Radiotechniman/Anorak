@@ -1,5 +1,6 @@
 import os, urllib, urllib2
 import datetime
+import httplib
 
 import lib.web as web
 import model
@@ -32,8 +33,8 @@ def SABnzbd(title=None, nzburl=None):
 ## FUTURE-CODE
 #    if settings.priority:
 #        params["priority"] = settings.prriority
-#    if settings.preprocessor:
-#        params["script"] = settings.script
+    #if settings.preprocessor:
+    #    params["script"] = settings.script
 
     # Note: If the url doesn't contain a slash at the end this won't work
     URL = HOST + "api?" + urllib.urlencode(params) 

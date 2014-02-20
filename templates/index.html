@@ -7,10 +7,12 @@ $var title: Home
 $code: anime_list = list(animes) #This is a hack since IterBetter can only read through the list once.
 $if len(anime_list) > 0:
     <table border="1" width="100%">
+        <thead>
         <tr>
-            <td>Anime</td>
-            <td>Group</td>
+            <th>Anime</td>
+            <th>Group</td>
         </tr>
+        </thead>
     $for anime in anime_list:
 	    <tr>
 	        <td><a href="/anime/$anime.id">$anime.title</td>

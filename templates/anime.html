@@ -5,38 +5,45 @@ $var title = anime.title
 </h3>$anime.subber</h3>
 
 <table border="1" width="100%">
+    <thead>
     <tr>
-        <td>Episode</td>
-        <td>Title</td>
-        <td>Airdate</td>
-        <td>Status</td>
-        <td>Search</td>
+        <th>Episode</th>
+        <th>Title</th>
+        <th>Airdate</th>
+        <th>Status</th>
+        <th>Search</th>
     </tr>
+    </thead>
 $for episode in episodes:
 	<tr>
-		<td>$(episode.episode+1)</td>
+		<td>$(episode.episode)</td>
 		<td>$episode.title</td>
         $if episode.airdate!=None:
             <td>$episode.airdate.strftime("%Y-%m-%d")</td>
         $else:
             <td>TBD</td>
+        $if episode.wanted == 3:
+            <td>Downloaded</td>
         $if episode.wanted == 2:
             <td>Snatched</td>
-        $else:
-            $if episode.wanted == 1:
-                $if episode.airdate!=None:
-                    $if episode.airdate > datetime.datetime.now():
-                        <td>Unaired</td>
-                    $else:
-                        <td>Wanted</td>
-                $else:
+        $if episode.wanted == 1:
+            $if episode.airdate!=None:
+                $if episode.airdate > datetime.datetime.now():
                     <td>Unaired</td>
+                $else:
+                    <td>Wanted</td>
             $else:
-                $if episode.wanted == 0:
-                    <td>Skipped</td>
-        <td><form action="" method="post">$:episodeForm(episode.episode).render()</form></td>
+                <td>Unaired</td>
+        $if episode.wanted == 0:
+            <td>Skipped</td>
+        <td>
+            <form action="" method="post">
+                <input type="hidden" name="episode" value="$episode.episode">
+            </form>
+            <a href="" onclick="document.forms[$episode.episode].submit();return false;">Try</a>
+        </td>
 	</tr>
 </table>
 
 </br>
-<a href="/remove/$anime.id">Remove Anime</a>
+<a href="/remove/$anime.id">Remove Anime</a><a href="/refresh/$anime.id">Refresh Anime</a>

@@ -1,6 +1,7 @@
 CREATE TABLE animes (
     id integer primary key,
-    title text, subber text,
+    title text, 
+    subber text,
     quality integer,
     location text
 );
@@ -10,7 +11,7 @@ CREATE TABLE episodes (
     title text,
     episode integer,
     airdate timestamp,
-    wanted integer /*0 is skipped, 1 is wanted, 2 is snatched*/
+    wanted integer /*0 is skipped, 1 is wanted, 2 is snatched, 3 is downloaded*/
 );
 
 CREATE TABLE SABnzbd (

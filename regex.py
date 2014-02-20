@@ -1,3 +1,4 @@
+import os
 import re
 #use https://github.com/lad1337/Sick-Beard/blob/anime/sickbeard/name_parser/parser.py
 
@@ -179,23 +180,23 @@ class NameParser(object):
             self.compiled_regexes = []
             self._compile_regexes(regexMode)
     def _parse_string(self, name):
-        
+            
             if not name:
                 return None
-        
+            
             for (cur_regex_name, cur_regex) in self.compiled_regexes:
                 match = cur_regex.match(name)
 
                 if not match:
-                    #logger.log(u"No match found for '"+cur_regex_name+"' in '"+name+"'",logger.DEBUG)
+                    #print(u"No match found for '"+cur_regex_name+"' in '"+name+"'")
                     continue
-            
-            
+                    
+                
                 result = ParseResult(name)
                 result.which_regex = [cur_regex_name]
             
                 named_groups = match.groupdict().keys()
-                #logger.log(u"Matched: named_groups: "+str(named_groups)+" using '"+str(cur_regex_name)+"' in '"+name+"'",logger.DEBUG)
+                #print(u"Matched: named_groups: "+str(named_groups)+" using '"+str(cur_regex_name)+"' in '"+name+"'")
             
                 if 'series_name' in named_groups:
                     result.series_name = match.group('series_name')
@@ -250,6 +251,65 @@ class NameParser(object):
                     result.release_group = match.group('release_group')
 
                 return result
+            return None
+    def _convert_number(self, number):
+            if type(number) == int:
+                return number
+
+            # good lord I'm lazy
+            if number.lower() == 'i': return 1
+            if number.lower() == 'ii': return 2
+            if number.lower() == 'iii': return 3
+            if number.lower() == 'iv': return 4
+            if number.lower() == 'v': return 5
+            if number.lower() == 'vi': return 6
+            if number.lower() == 'vii': return 7
+            if number.lower() == 'viii': return 8
+            if number.lower() == 'ix': return 9
+            if number.lower() == 'x': return 10
+            if number.lower() == 'xi': return 11
+            if number.lower() == 'xii': return 12
+            if number.lower() == 'xiii': return 13
+            if number.lower() == 'xiv': return 14
+            if number.lower() == 'xv': return 15
+            if number.lower() == 'xvi': return 16
+            if number.lower() == 'xvii': return 17
+            if number.lower() == 'xviii': return 18
+            if number.lower() == 'xix': return 19
+            if number.lower() == 'xx': return 20
+            if number.lower() == 'xxi': return 21
+            if number.lower() == 'xxii': return 22
+            if number.lower() == 'xxiii': return 23
+            if number.lower() == 'xxiv': return 24
+            if number.lower() == 'xxv': return 25
+            if number.lower() == 'xxvi': return 26
+            if number.lower() == 'xxvii': return 27
+            if number.lower() == 'xxviii': return 28
+            if number.lower() == 'xxix': return 29
+
+            return int(number)
+    def clean_series_name(self, series_name):
+            """Cleans up series name by removing any . and _
+            characters, along with any trailing hyphens.
+    
+            Is basically equivalent to replacing all _ and . with a
+            space, but handles decimal numbers in string, for example:
+    
+            >>> cleanRegexedSeriesName("an.example.1.0.test")
+            'an example 1.0 test'
+            >>> cleanRegexedSeriesName("an_example_1.0_test")
+            'an example 1.0 test'
+        
+            Stolen from dbr's tvnamer
+            """
+        
+            series_name = re.sub("(\D)\.(?!\s)(\D)", "\\1 \\2", series_name)
+            series_name = re.sub("(\d)\.(\d{4})", "\\1 \\2", series_name) # if it ends in a year then don't keep the dot
+            series_name = re.sub("(\D)\.(?!\s)", "\\1 ", series_name)
+            series_name = re.sub("\.(?!\s)(\D)", " \\1", series_name)
+            series_name = series_name.replace("_", " ")
+            series_name = re.sub("-$", "", series_name)
+            return series_name.strip()
     def _compile_regexes(self,regexMode):
             for (cur_pattern_name, cur_pattern) in anime_ep_regexes:
                 try:
