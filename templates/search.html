@@ -10,10 +10,12 @@ $if results != None:
     <hr/>
     <br/>
     <table border="1" width="100%">
+            <thead>
             <tr>
-                <td>Anime</td>
-                <td>Action</td>
+                <th>Anime</th>
+                <th>Action</th>
             </tr>
+            </thead>
 	    $for result in results:
 	        <tr>
 			    $if result.titles.has_key('en'):

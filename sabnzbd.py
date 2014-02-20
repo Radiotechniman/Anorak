@@ -34,7 +34,7 @@ def SABnzbd(title=None, nzburl=None):
 #    if settings.priority:
 #        params["priority"] = settings.prriority
     #if settings.preprocessor:
-    #    params["script"] = settings.script
+    params["script"] = "sabToAnorak.py"
 
     # Note: If the url doesn't contain a slash at the end this won't work
     URL = HOST + "api?" + urllib.urlencode(params) 

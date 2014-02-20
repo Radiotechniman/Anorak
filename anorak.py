@@ -62,6 +62,13 @@ class Index:
 
 class Anime:
     
+    form = web.form.Form(
+        web.form.Textbox('location', web.form.notnull,
+        size=30,
+        description="Location"),
+        web.form.Button('Change'),
+    )
+    
     def episodeForm(self,episode=None):
         return web.form.Form(
             web.form.Hidden('episode', value=episode),

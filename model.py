@@ -13,6 +13,7 @@ def get_anime(id):
         return None
         
 def get_anime_by_title(title):
+    # Custom query to make sure the where is case-insensitive
     try:
         return db.query("SELECT * FROM animes WHERE LOWER(title)=LOWER(\'%s\')" % title)[0]
     except IndexError:
