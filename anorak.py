@@ -29,7 +29,7 @@ urls = (
     '/search', 'Search',
     '/add/(\d+)', 'Add',
 	'/remove/(\d+)', 'Remove',
-    '/process/(\d+)', 'Process',
+    '/process', 'Process',
 )
 
 searchForm = web.form.Form(
@@ -148,15 +148,21 @@ class Add:
         
 class Remove:
     
-    def GET(self, id):
+    def GET(self, id, ):
         model.remove_anime(id)
         return "Anime %s removed from database" % id
         
 class Process:
     
-    def GET(self, dirName, nzbName=None):
-        process.processEpisode(dirName, nzbName)
-        return "Success"
+    def GET(self):
+        query = web.input()
+        try:
+            nzbName = query.nzbName
+        except:
+            nzbName = None
+        if (process.processEpisode(query.dir, nzbName)):
+            return "Successfully processed episode."
+        return "Episode failed to process."
 
 class Search:
     
@@ -179,14 +185,6 @@ class Search:
         results = anidb.search(searchForm.d.query)
         searchForm.d.query = ""
         return render.search(searchForm, results)
-        
-class FakeSettings:
-    
-    def __init__(self):
-        self.url=None
-        self.port=None
-        self.key=None
-        self.category=None
         
 class Settings:
     

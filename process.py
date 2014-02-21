@@ -6,10 +6,15 @@ import urlparse
 
 def processEpisode(dirName, nzbName=None):
     print dirName
+    success = False
     for root, dirs, files in os.walk(dirName):
         for file in files:
-            processFileAgainstDatabase(dirName, file)
-    shutil.rmtree(dirName)
+            if(processFileAgainstDatabase(dirName, file)):
+                success = True
+    if (success):
+        shutil.rmtree(dirName)
+    return success
+
             
 def processFileAgainstDatabase(dirName, file):
     regexParser = regex.NameParser()
@@ -21,6 +26,10 @@ def processFileAgainstDatabase(dirName, file):
             if not anime_from_database == None:
                 print "Anime matched database, moving"
                 model.downloaded_episode(anime_from_database.id, anime.ab_episode_numbers[0])
-                shutil.move(os.path.join(dirName,file), anime_from_database.location)
+                if not os.path.exists(anime_from_database.location):
+                    os.makedirs(anime_from_database.location)
+                shutil.move(os.path.join(dirName,file), os.path.join(anime_from_database.location, file))
+                return True
             else:
                 print "Anime not in database, bailing"
+                return False

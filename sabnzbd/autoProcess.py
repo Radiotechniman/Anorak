@@ -69,7 +69,7 @@ def processEpisode(dirName, nzbName=None):
     else:
         protocol = "http://"
 
-    url = protocol + host + ":" + port + web_root + "/process/?" + urllib.urlencode(params)
+    url = protocol + host + ":" + port + web_root + "/process?" + urllib.urlencode(params)
     
     print "Opening URL:", url
     
