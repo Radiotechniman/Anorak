@@ -1,0 +1,14 @@
+.idea/.name
+.idea/Anorak.iml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scopes/scope_settings.xml
+.idea/vcs.xml
+.idea/workspace.xml
+anorak.pyc
+model.pyc
+process.pyc
+sabnzbd.pyc
+sabnzbd/.DS_Store
+.DS_Store

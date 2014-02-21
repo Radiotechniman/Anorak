@@ -1,14 +1,20 @@
 import os, urllib, urllib2
 import datetime
 import httplib
-
+import ConfigParser
 import lib.web as web
 import model
 
 def SABnzbd(title=None, nzburl=None):
-    settings = model.get_settings()
+    settings = ConfigParser.ConfigParser()
+    try:
+        file = open("anorak.cfg", "r")
+        settings.readfp(file)
+        file.close()
+    except IOError, e:
+        print "Could not read configuration file: ", str(e)
 
-    HOST = settings.url
+    HOST = settings.get("SABnzbd", "url")
     if not str(HOST)[:4] == "http":
         HOST = 'http://' + HOST
 
@@ -18,21 +24,21 @@ def SABnzbd(title=None, nzburl=None):
     params['name'] = nzburl
     params['nzbname'] = title
 
-    if settings.username:
-        params['ma_username'] = settings.username
-    if settings.password:
-        params['ma_password'] = settings.password
-    if settings.key:
-        params['apikey'] = settings.key
-    if settings.category:
-        params['cat'] = settings.category
+    if len(settings.get("SABnzbd", "username")):
+        params['ma_username'] = settings.get("SABnzbd", "username")
+    if len(settings.get("SABnzbd", "password")):
+        params['ma_password'] = settings.get("SABnzbd", "password")
+    if len(settings.get("SABnzbd", "key")):
+        params['apikey'] = settings.get("SABnzbd", "key")
+    if len(settings.get("SABnzbd", "category")):
+        params['cat'] = settings.get("SABnzbd", "category")
 
     #if settings.retention:
     #    params["maxage"] = settings.retention
 
 ## FUTURE-CODE
 #    if settings.priority:
-#        params["priority"] = settings.prriority
+#        params["priority"] = settings.priority
     #if settings.preprocessor:
     params["script"] = "sabToAnorak.py"
 

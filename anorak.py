@@ -1,9 +1,12 @@
 import lib.web as web
 import lib.anidb as anidb
+import sys
 import model
 import datetime
 import search
 import metadata
+import process
+import ConfigParser
 from downloader import *
 #setup database with sqlite3 anorak < schema.sql
 """
@@ -26,6 +29,7 @@ urls = (
     '/search', 'Search',
     '/add/(\d+)', 'Add',
 	'/remove/(\d+)', 'Remove',
+    '/process/(\d+)', 'Process',
 )
 
 searchForm = web.form.Form(
@@ -52,6 +56,29 @@ t_globals = {
 render = web.template.render('templates', base='base', globals=t_globals)
 
 anidb.set_client('anorakk', 1)
+
+settings = ConfigParser.ConfigParser()
+
+try:
+    file = open("anorak.cfg", "r")
+    settings.readfp(file)
+    file.close()
+except IOError, e:
+    print "Could not read configuration file: ", str(e)
+
+# Setup the default settings and create the sections
+if not settings.has_section("Anorak"):
+    settings.add_section("Anorak")
+    settings.add_section("SABnzbd")
+    settings.set("Anorak", "port", 26463)
+    settings.set("SABnzbd", "url", "http://localhost:8080/")
+    settings.set("SABnzbd", "key", "")
+    settings.set("SABnzbd", "category", "")
+    settings.set("SABnzbd", "username", "")
+    settings.set("SABnzbd", "password", "")
+    file = open("anorak.cfg","w")
+    settings.write(file)
+    file.close()
 
 class Index:
     
@@ -124,6 +151,12 @@ class Remove:
     def GET(self, id):
         model.remove_anime(id)
         return "Anime %s removed from database" % id
+        
+class Process:
+    
+    def GET(self, dirName, nzbName=None):
+        process.processEpisode(dirName, nzbName)
+        return "Success"
 
 class Search:
     
@@ -157,47 +190,63 @@ class FakeSettings:
         
 class Settings:
     
-    settings = model.get_settings()
-    if (settings==None):
-        # If we can't get the settings it will return a None type object.
-        # FakeSettings replaces None an object with blank properties.
-        settings = FakeSettings()
-    
     form = web.form.Form(
         web.form.Textbox('url', web.form.notnull,
         size=30,
-        value=settings.url,
+        value=settings.get("SABnzbd", "url"),
         description="SABnzbd URL:"),
+
+        web.form.Textbox('username',
+        size=30,
+        value=settings.get("SABnzbd", "username"),
+        description="SABnzbd Username:"),
+
+        web.form.Password('password',
+        size=30,
+        value=settings.get("SABnzbd", "password"),
+        description="SABnzbd Password:"),
+
         web.form.Textbox('key', web.form.notnull,
         size=30,
-        value=settings.key,
-        description="API key:"),
-        web.form.Textbox('category', web.form.notnull,
+        value=settings.get("SABnzbd", "key"),
+        description="SABnzbd API key:"),
+
+        web.form.Textbox('category',
         size=30,
-        value=settings.category,
-        description="Category:"),
+        value=settings.get("SABnzbd", "category"),
+        description="SABnzbd Category:"),
+
         web.form.Button('Update'),
     )
     
     def GET(self):
-        #reload settings after page settings load
-        settings = model.get_settings()
-        if (settings==None):
-            settings = FakeSettings()
-    
+        # make sure the form is updated with newly saved config
         form = web.form.Form(
             web.form.Textbox('url', web.form.notnull,
             size=30,
-            value=settings.url,
+            value=settings.get("SABnzbd", "url"),
             description="SABnzbd URL:"),
+
+            web.form.Textbox('username',
+            size=30,
+            value=settings.get("SABnzbd", "username"),
+            description="SABnzbd Username:"),
+
+            web.form.Password('password',
+            size=30,
+            value=settings.get("SABnzbd", "password"),
+            description="SABnzbd Password:"),
+
             web.form.Textbox('key', web.form.notnull,
             size=30,
-            value=settings.key,
-            description="API key:"),
-            web.form.Textbox('category', web.form.notnull,
+            value=settings.get("SABnzbd", "key"),
+            description="SABnzbd API key:"),
+
+            web.form.Textbox('category',
             size=30,
-            value=settings.category,
-            description="Category:"),
+            value=settings.get("SABnzbd", "category"),
+            description="SABnzbd Category:"),
+
             web.form.Button('Update'),
         )
         return render.settings(form)
@@ -206,12 +255,20 @@ class Settings:
         form = self.form()
         if not form.validates():
             return render.settings(form)
-        model.update_settings(form.d.url, form.d.key, form.d.category)
+        settings.set("SABnzbd", "url", form.d.url)
+        settings.set("SABnzbd", "username", form.d.username)
+        settings.set("SABnzbd", "password", form.d.password)
+        settings.set("SABnzbd", "key", form.d.key)
+        settings.set("SABnzbd", "category", form.d.category)
+        file = open("anorak.cfg","w")
+        settings.write(file)
+        file.close()
         return render.settings(form)
 
 app = web.application(urls, globals())
 search = search.SearchThread()
 
 if __name__ == '__main__':
+    sys.argv[1:] = [settings.get("Anorak", "port")]
     search.start()
     app.run()

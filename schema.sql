@@ -14,14 +14,6 @@ CREATE TABLE episodes (
     wanted integer /*0 is skipped, 1 is wanted, 2 is snatched, 3 is downloaded*/
 );
 
-CREATE TABLE SABnzbd (
-    url text primary key,
-    username text,
-    password text,
-    key text,
-    category text
-);
-
 CREATE TABLE Settings (
     location text primary key,
 );
