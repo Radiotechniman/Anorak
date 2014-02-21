@@ -29,6 +29,7 @@ urls = (
     '/search', 'Search',
     '/add/(\d+)', 'Add',
 	'/remove/(\d+)', 'Remove',
+    '/refresh/(\d+)', 'Refresh',
     '/process', 'Process',
 )
 
@@ -64,13 +65,14 @@ try:
     settings.readfp(file)
     file.close()
 except IOError, e:
-    print "Could not read configuration file: ", str(e)
+    print "Creating configuration file"
 
 # Setup the default settings and create the sections
 if not settings.has_section("Anorak"):
     settings.add_section("Anorak")
     settings.add_section("SABnzbd")
     settings.set("Anorak", "port", 26463)
+    settings.set("Anorak", "searchFrequency", 30)
     settings.set("SABnzbd", "url", "http://localhost:8080/")
     settings.set("SABnzbd", "key", "")
     settings.set("SABnzbd", "category", "")
@@ -78,6 +80,10 @@ if not settings.has_section("Anorak"):
     settings.set("SABnzbd", "password", "")
     file = open("anorak.cfg","w")
     settings.write(file)
+    file.close()
+    # Weirdness, settings must be reloaded from file or else ConfigParser throws a hissy fit
+    file = open("anorak.cfg", "r")
+    settings.readfp(file)
     file.close()
 
 class Index:
@@ -144,13 +150,19 @@ class Add:
         if not form.validates():
             return render.add(form, anime)
         metadata.newAnime(anime)
-        raise web.seeother('/')
+        raise web.seeother('/anime/%s' % int(id))
         
 class Remove:
     
-    def GET(self, id, ):
+    def GET(self, id):
         model.remove_anime(id)
-        return "Anime %s removed from database" % id
+        raise web.seeother('/')
+
+class Refresh:
+
+    def GET(self, id):
+        metadata.refreshForAnime(int(id))
+        raise web.seeother('/anime/%s' % id)
         
 class Process:
     
@@ -188,7 +200,7 @@ class Search:
         
 class Settings:
     
-    form = web.form.Form(
+    sabnzbdForm = web.form.Form(
         web.form.Textbox('url', web.form.notnull,
         size=30,
         value=settings.get("SABnzbd", "url"),
@@ -216,52 +228,38 @@ class Settings:
 
         web.form.Button('Update'),
     )
+
+    settingsForm = web.form.Form(
+        web.form.Textbox('port', web.form.notnull,
+        size=30,
+        value=str(settings.get("Anorak", "port")),
+        description="Port Number:"),
+
+        web.form.Textbox('searchFrequency', web.form.notnull,
+        size=30,
+        value=str(settings.get("Anorak", "searchFrequency")),
+        description="Search Frequency:"),
+
+        web.form.Button('Update'),
+    )
     
     def GET(self):
-        # make sure the form is updated with newly saved config
-        form = web.form.Form(
-            web.form.Textbox('url', web.form.notnull,
-            size=30,
-            value=settings.get("SABnzbd", "url"),
-            description="SABnzbd URL:"),
-
-            web.form.Textbox('username',
-            size=30,
-            value=settings.get("SABnzbd", "username"),
-            description="SABnzbd Username:"),
-
-            web.form.Password('password',
-            size=30,
-            value=settings.get("SABnzbd", "password"),
-            description="SABnzbd Password:"),
-
-            web.form.Textbox('key', web.form.notnull,
-            size=30,
-            value=settings.get("SABnzbd", "key"),
-            description="SABnzbd API key:"),
-
-            web.form.Textbox('category',
-            size=30,
-            value=settings.get("SABnzbd", "category"),
-            description="SABnzbd Category:"),
-
-            web.form.Button('Update'),
-        )
-        return render.settings(form)
+        return render.settings(self.settingsForm, self.sabnzbdForm)
     
     def POST(self):
-        form = self.form()
-        if not form.validates():
-            return render.settings(form)
-        settings.set("SABnzbd", "url", form.d.url)
-        settings.set("SABnzbd", "username", form.d.username)
-        settings.set("SABnzbd", "password", form.d.password)
-        settings.set("SABnzbd", "key", form.d.key)
-        settings.set("SABnzbd", "category", form.d.category)
+        if not self.sabnzbdForm.validates():
+            return render.settings(self.settingsForm, self.sabnzbdForm)
+        settings.set("Anorak", "searchFrequency", self.settingsForm.d.searchFrequency)
+        settings.set("Anorak", "port", self.settingsForm.d.port)
+        settings.set("SABnzbd", "url", self.sabnzbdForm.d.url)
+        settings.set("SABnzbd", "username", self.sabnzbdForm.d.username)
+        settings.set("SABnzbd", "password", self.sabnzbdForm.d.password)
+        settings.set("SABnzbd", "key", self.sabnzbdForm.d.key)
+        settings.set("SABnzbd", "category", self.sabnzbdForm.d.category)
         file = open("anorak.cfg","w")
         settings.write(file)
         file.close()
-        return render.settings(form)
+        return render.settings(self.settingsForm, self.sabnzbdForm)
 
 app = web.application(urls, globals())
 search = search.SearchThread()

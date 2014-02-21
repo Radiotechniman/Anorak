@@ -28,6 +28,10 @@ class Form(object):
         u'<table>\n    <tr><th><label for="x">x</label></th><td><input type="text" id="x" name="x"/></td></tr>\n</table>'
     """
     def __init__(self, *inputs, **kw):
+        """
+
+        :rtype : object
+        """
         self.inputs = inputs
         self.valid = True
         self.note = None

@@ -1,6 +1,7 @@
 import lib.anidb as anidb
+import model
 
-def newAnime(self, anime):
+def newAnime(anime):
     #anime = anidb.query(anidb.QUERY_ANIME, id)
     model.new_anime(anime.id, anime.titles['x-jat'][0].title, form.d.subber, quality=0)
     for i in xrange(anime.episodecount):
@@ -20,10 +21,21 @@ def newAnime(self, anime):
             # This episode is so far in the future it doesn't even have any information! It must be unaired. Mark as wanted. We'll definitely want to refresh the metadata at a later date for this one!
             model.new_episode(anime.id, i+1, "Episode "+str(i+1), 1)
 
-def refreshForAnime(self, id):
-    anime = anidb.query(anidb.QUERY_ANIME, int(id))
-    episodes = model.get_episodes(id)
+def refreshForAnime(id):
+    anime = anidb.query(anidb.QUERY_ANIME, id)
+    episodes = list(model.get_episodes(id))
+
+    # update episodes that have new information
+
     for episode in episodes:
-        if episode.title == None:
-            if anime.episodes[episode.episode] != None:
-                model.update_episode(id, anime.episodes[episode.episode].titles['en'][0].title, anime.episodes[episode.episode].airdate)
+        if episode.title[:7]=="Episode":
+            if anime.episodes[str(episode.episode)] != None:
+                model.update_episode(id, episode.episode, anime.episodes[str(episode.episode)].titles['en'][0].title, anime.episodes[str(episode.episode)].airdate)
+
+    # there are new episodes, create them
+    if len(episodes)<anime.episodecount:
+        currentEpisodeCount = len(list(episodes))
+        numberOfNewEpisodes = anime.episodecount-currentEpisodeCount
+        for i in xrange(numberOfNewEpisodes):
+            episodeNumber = currentEpisodeCount+(i+1)
+            model.new_episode(anime.id, episodeNumber, anime.episodes[str(episodeNumber)].titles['en'][0].title, 1, anime.episodes[str(episodeNumber)].airdate)

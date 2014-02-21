@@ -1,7 +1,11 @@
-$def with (form)
+$def with (settingsForm, sabnzbdForm)
 $var title: Settings
 
 <h2>Settings</h2>
 <form action="" method="post">
-$:form.render()
+$:settingsForm.render()
+</form>
+<h2>SABnzbd</h2>
+<form action="" method="post">
+$:sabnzbdForm.render()
 </form>
