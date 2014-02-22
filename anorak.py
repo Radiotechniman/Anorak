@@ -226,6 +226,8 @@ class Settings:
         value=settings.get("SABnzbd", "category"),
         description="SABnzbd Category:"),
 
+        web.form.Hidden('form', value="sabnzbd"),
+
         web.form.Button('Update'),
     )
 
@@ -240,6 +242,8 @@ class Settings:
         value=str(settings.get("Anorak", "searchFrequency")),
         description="Search Frequency:"),
 
+        web.form.Hidden('form', value="settings"),
+
         web.form.Button('Update'),
     )
     
@@ -247,10 +251,29 @@ class Settings:
         return render.settings(self.settingsForm, self.sabnzbdForm)
     
     def POST(self):
-        if not self.sabnzbdForm.validates():
+        i = web.input()
+
+        # assuming that the name of the hidden field is "form"
+        if i.form == "settings":
+            return self.POST_settings()
+        else:
+            return self.POST_sabnzbd()
+
+        #return render.settings(self.settingsForm, self.sabnzbdForm)
+
+    def POST_settings(self):
+        if not self.settingsForm.validates():
             return render.settings(self.settingsForm, self.sabnzbdForm)
         settings.set("Anorak", "searchFrequency", self.settingsForm.d.searchFrequency)
         settings.set("Anorak", "port", self.settingsForm.d.port)
+        file = open("anorak.cfg","w")
+        settings.write(file)
+        file.close()
+        return render.settings(self.settingsForm, self.sabnzbdForm)
+
+    def POST_sabnzbd(self):
+        if not self.sabnzbdForm.validates():
+            return render.settings(self.settingsForm, self.sabnzbdForm)
         settings.set("SABnzbd", "url", self.sabnzbdForm.d.url)
         settings.set("SABnzbd", "username", self.sabnzbdForm.d.username)
         settings.set("SABnzbd", "password", self.sabnzbdForm.d.password)

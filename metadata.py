@@ -2,7 +2,6 @@ import lib.anidb as anidb
 import model
 
 def newAnime(anime):
-    #anime = anidb.query(anidb.QUERY_ANIME, id)
     model.new_anime(anime.id, anime.titles['x-jat'][0].title, form.d.subber, quality=0)
     for i in xrange(anime.episodecount):
         if anime.episodes.has_key(str(i+1)):
