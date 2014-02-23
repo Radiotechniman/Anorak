@@ -5,7 +5,7 @@ from xml.dom import minidom
 
 def update_plex():
     _settings = settings.getSettings()
-    host = _settings.get("Plex", "host")
+    host = _settings.get("Plex", "url")
 
     if host == None:
         print("No Plex Server host specified, check your settings")
