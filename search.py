@@ -19,6 +19,7 @@ class SearchThread(threading.Thread):
         tomorrow = datetime.datetime.now()+datetime.timedelta(days=1)
         year = tomorrow.year
         month = tomorrow.month
+        day = tomorrow.day
         hour = random.choice(range(1,24))
         self.date = datetime.datetime(year, month, day, hour)
 
@@ -59,6 +60,8 @@ class SearchThread(threading.Thread):
                         self.downloader.anime = anime.title
                         self.downloader.group = anime.subber
                         self.downloader.episode = episode.episode
+                        if anime.alternativeTitle != None and len(anime.alternativeTitle) > 0:
+                            self.downloader.anime = anime.alternativeTitle
                         if (self.downloader.download()):
                             model.snatched_episode(id, episode.episode)
                             return "Snatched successfully"

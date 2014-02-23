@@ -9,18 +9,6 @@ import process
 import ConfigParser
 from downloader import *
 #setup database with sqlite3 anorak < schema.sql
-"""
-Setup database from some sort of wizard
-import os
-if not os.path.exists('anorak.db'):
-    import sqlite3
-    conn = sqlite3.connect('anorak.db')
-    c = conn.cursor()
-    schema = open('schema.sql', 'r').read()
-    c.execute(schema)
-    conn.commit()
-    c.close()
-"""
 
 urls = (
 	'/', 'Index',
@@ -35,6 +23,7 @@ urls = (
 
 searchForm = web.form.Form(
         web.form.Textbox('query',
+        web.form.notnull,
         size=15,
         height="100%",
         description="",
@@ -43,13 +32,54 @@ searchForm = web.form.Form(
         id="search_button"),
     )
 
+def setupDatabase():
+    import os
+    if not os.path.exists('anorak.db'):
+        import sqlite3
+        conn = sqlite3.connect('anorak.db')
+        c = conn.cursor()
+        schema = open('schema.sql', 'r').read()
+        c.executescript(schema)
+        conn.commit()
+        c.close()
+
+def getConfig():
+    try:
+        file = open("anorak.cfg", "r")
+        settings.readfp(file)
+        file.close()
+    except IOError, e:
+        print "Creating configuration file"
+        setupConfig()
+
+def setupConfig():
+    # Setup the default settings and create the sections
+    if not settings.has_section("Anorak"):
+        settings.add_section("Anorak")
+        settings.add_section("SABnzbd")
+        settings.set("Anorak", "port", 26463)
+        settings.set("Anorak", "searchFrequency", 30)
+        settings.set("SABnzbd", "url", "http://localhost:8080/")
+        settings.set("SABnzbd", "key", "")
+        settings.set("SABnzbd", "category", "")
+        settings.set("SABnzbd", "username", "")
+        settings.set("SABnzbd", "password", "")
+        file = open("anorak.cfg","w")
+        settings.write(file)
+        file.close()
+        # Weirdness, settings must be reloaded from file or else ConfigParser throws a hissy fit
+        file = open("anorak.cfg", "r")
+        settings.readfp(file)
+        file.close()
+
 ### Templates
 t_globals = {
 	'datestr': web.datestr,
     'str': str,
     'len': len,
     'datetime': datetime,
-    'searchForm': searchForm
+    'searchForm': searchForm,
+    'createTitleListing': metadata.createTitleListing
 }
 
 #web.config.debug = False
@@ -60,31 +90,8 @@ anidb.set_client('anorakk', 1)
 
 settings = ConfigParser.ConfigParser()
 
-try:
-    file = open("anorak.cfg", "r")
-    settings.readfp(file)
-    file.close()
-except IOError, e:
-    print "Creating configuration file"
-
-# Setup the default settings and create the sections
-if not settings.has_section("Anorak"):
-    settings.add_section("Anorak")
-    settings.add_section("SABnzbd")
-    settings.set("Anorak", "port", 26463)
-    settings.set("Anorak", "searchFrequency", 30)
-    settings.set("SABnzbd", "url", "http://localhost:8080/")
-    settings.set("SABnzbd", "key", "")
-    settings.set("SABnzbd", "category", "")
-    settings.set("SABnzbd", "username", "")
-    settings.set("SABnzbd", "password", "")
-    file = open("anorak.cfg","w")
-    settings.write(file)
-    file.close()
-    # Weirdness, settings must be reloaded from file or else ConfigParser throws a hissy fit
-    file = open("anorak.cfg", "r")
-    settings.readfp(file)
-    file.close()
+getConfig()
+setupDatabase()
 
 class Index:
     
@@ -94,18 +101,25 @@ class Index:
         return render.index(animes)
 
 class Anime:
-    
-    form = web.form.Form(
-        web.form.Textbox('location', web.form.notnull,
-        size=30,
-        description="Location"),
-        web.form.Button('Change'),
-    )
-    
+
     def episodeForm(self,episode=None):
         return web.form.Form(
             web.form.Hidden('episode', value=episode),
-            web.form.Button('Try'),
+            web.form.Hidden('form', value="episode"),
+            #web.form.Button('Try'),
+        )
+
+    def editorForm(self,anime):
+        return web.form.Form(
+            web.form.Textbox('location', web.form.notnull,
+            size=30,
+            value=anime.location,
+            description="Location"),
+            web.form.Textbox('alternativeTitle', web.form.notnull,
+            size=30,
+            description="Name override (for searching only)"),
+            web.form.Hidden('form', value="editor"),
+            web.form.Button('Update'),
         )
     
     def GET(self, id):
@@ -113,19 +127,36 @@ class Anime:
         anime = model.get_anime(id)
         episodes = model.get_episodes(id)
         episodeForm = self.episodeForm
-        return render.anime(anime, episodes, episodeForm)
+        return render.anime(anime, episodes, episodeForm, self.editorForm(anime))
         
     def POST(self, id):
+        i = web.input()
+
+        # assuming that the name of the hidden field is "form"
+        if i.form == "editor":
+            return self.POST_editor(id)
+        else:
+            return self.POST_snatch(id)
+
+    def POST_snatch(self, id):
         anime = model.get_anime(id)
         downloader = Downloader()
         downloader.anime = anime.title
         downloader.group = anime.subber
         downloader.episode = web.input().episode
+        # check for x-jat title override
+        if anime.alternativeTitle != None and len(anime.alternativeTitle) > 0:
+            self.downloader.anime = anime.alternativeTitle
         if (downloader.download()):
             model.snatched_episode(id, web.input().episode)
             return "Snatched successfully"
         else:
             return "Couldn't snatch episode %s" % web.input().episode
+
+    def POST_editor(self, id):
+        model.update_anime_location(id, web.input().location)
+        model.set_alternative_title_by_id(id, web.input().alternativeTitle)
+        raise web.seeother('/anime/%s' % id)
         
 class Add:
     
@@ -178,25 +209,15 @@ class Process:
 
 class Search:
     
-    """form = web.form.Form(
-        web.form.Textbox('query', web.form.notnull,
-        size=30,
-        description=""),
-        web.form.Button('Search'),
-    )"""
-    
     def GET(self):
         """ Search for Anime and add it """
-        #form = self.form()
-        return render.search(searchForm, None)
+        return render.search(None)
         
     def POST(self):
-        #form = self.form()
         if not searchForm.validates():
-            return render.search(searchForm, None)
+            return render.search(None)
         results = anidb.search(searchForm.d.query)
-        searchForm.d.query = ""
-        return render.search(searchForm, results)
+        return render.search(results)
         
 class Settings:
     
@@ -253,13 +274,11 @@ class Settings:
     def POST(self):
         i = web.input()
 
-        # assuming that the name of the hidden field is "form"
+        # determine which form to process based on the hidden value "form"
         if i.form == "settings":
             return self.POST_settings()
         else:
             return self.POST_sabnzbd()
-
-        #return render.settings(self.settingsForm, self.sabnzbdForm)
 
     def POST_settings(self):
         if not self.settingsForm.validates():

@@ -1,12 +1,8 @@
-$def with (form, results)
+$def with (results)
 $var title: Search
 
-<h2>Search</h2>
-<form action="" method="post">
-$:form.render()
-</form>
-
 $if results != None:
+    <h2>Searching</h2>
     <hr/>
     <br/>
     <table border="1" width="100%">
@@ -18,16 +14,9 @@ $if results != None:
             </thead>
 	    $for result in results:
 	        <tr>
-			    $if result.titles.has_key('en'):
-				    $if result.titles.has_key('x-jat'):
-					    <td>$result.titles['en'][0].title ($result.titles['x-jat'][0].title)</td>
-				    $else:
-					    <td>$result.titles['en'][0].title</td>
-			    $else:
-				    $if result.titles.has_key('x-jat'):
-					    <td>$result.titles['x-jat'][0].title</td>
-				    $else:
-					    <td>Fail</td>
+                <td>$createTitleListing(result.titles)</td>
 			    <td><a href="/add/$result.id">Add Anime</a></td>
 		    </tr>
     </table>
+$else:
+    <h4>Type something in the search field.</h4>

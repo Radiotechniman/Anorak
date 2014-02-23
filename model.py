@@ -19,13 +19,20 @@ def get_anime_by_title(title):
     except IndexError:
         return None
 
+def update_anime_location(id, location):
+    db.update('animes', where='id=$id', vars=locals(),
+              location=location)
+
 def new_anime(id, title, subber, quality=0):
     db.insert('animes', id=id, title=title, subber=subber, quality=quality)
     
 def remove_anime(id):
     db.delete('animes', where='id=$id', vars=locals())
-    # this may or may not delete all the episodes for the given anime
     db.delete('episodes', where='id=$id', vars=locals())
+
+def set_alternative_title_by_id(id, title):
+    db.update('animes', where='id=$id', vars=locals(),
+        alternativeTitle=title)
     
 def snatched_episode(id, episode):
     db.update('episodes', where='id=$id AND episode=$episode', vars=locals(),
@@ -49,4 +56,4 @@ def get_episodes(id):
         return None
 
 def remove_episode(id, episode):
-    db.delete(episodes, where='id=$id AND episode=$episode', vars=locals())
+    db.delete(episode, where='id=$id AND episode=$episode', vars=locals())

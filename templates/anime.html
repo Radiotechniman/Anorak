@@ -1,8 +1,8 @@
-$def with (anime, episodes, episodeForm)
+$def with (anime, episodes, episodeForm, editorForm)
 $var title = anime.title
 
 <h2>$anime.title</h2>
-</h3>Group: $anime.subber</h3>
+<h3>Group: $anime.subber</h3>
 
 <table border="1" width="100%">
     <thead>
@@ -38,7 +38,8 @@ $for episode in episodes:
             <td>Skipped</td>
         <td>
             <form action="" method="post">
-                <input type="hidden" name="episode" value="$episode.episode">
+                $:episodeForm(episode.episode).episode.render()
+                $:episodeForm(episode.episode).form.render()
             </form>
             <a href="" onclick="document.forms[$episode.episode].submit();return false;">Try</a>
         </td>
@@ -46,4 +47,13 @@ $for episode in episodes:
 </table>
 
 </br>
-<a href="/remove/$anime.id">Remove Anime</a><a href="/refresh/$anime.id">Refresh Anime</a>
+
+
+<h4>Editor</h4>
+<p>Note: If no releases are being picked up by Anorak it's probably because the release group is using a different name other than the official name picked up by AniDB.net. Try overriding the name for search.</p>
+<form action="" method="post">
+$:editorForm.render()
+</form>
+
+</br>
+<a href="/remove/$anime.id">Remove Anime</a> | <a href="/refresh/$anime.id">Refresh Anime Metadata</a>

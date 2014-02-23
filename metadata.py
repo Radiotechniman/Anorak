@@ -25,7 +25,6 @@ def refreshForAnime(id):
     episodes = list(model.get_episodes(id))
 
     # update episodes that have new information
-
     for episode in episodes:
         if episode.title[:7]=="Episode":
             if anime.episodes[str(episode.episode)] != None:
@@ -38,3 +37,29 @@ def refreshForAnime(id):
         for i in xrange(numberOfNewEpisodes):
             episodeNumber = currentEpisodeCount+(i+1)
             model.new_episode(anime.id, episodeNumber, anime.episodes[str(episodeNumber)].titles['en'][0].title, 1, anime.episodes[str(episodeNumber)].airdate)
+
+def mainTitle(titles):
+    for lang, titles in titles.items():
+        for title in titles:
+            # note: for some reason type main doesn't pick up chinese or korean titles
+            if title.type == "main":
+                return title.title
+
+def createTitleListing(titles):
+    combinedTitle = ""
+    main = ""
+    en = ""
+    for lang, titles in titles.items():
+        for title in titles:
+            # note: for some reason type main doesn't pick up chinese or korean titles
+            if title.type == "main":
+                main = title.title
+            if title.lang == "en":
+                if title.type == "official":
+                    en = title.title
+                    break
+    if len(main) > 0:
+        combinedTitle = main
+    if len(en) > 0:
+        combinedTitle = combinedTitle + " (%s)" % en
+    return combinedTitle
