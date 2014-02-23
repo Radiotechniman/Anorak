@@ -34,9 +34,10 @@ def search(group, anime, episode):
     payload = {"cat": "anime",
     "max": 100}
     downloads = []
-    payload['q'] = "[%s] %s - %s" % (group, anime, episode)
+    #payload['q'] = "[%s] %s - %s" % (group, anime, episode)
+    payload['q'] = "%s %s %s" % (group, anime, episode)
     r = requests.get("http://fanzub.com/rss", params=payload)
-    #print("Fanzub final search for term %s url %s" % (query, r.url))
+    print("Fanzub final search for term %s url %s" % (payload['q'], r.url))
     try:
         xml = ET.fromstring(r.text)
         items = xml.findall("channel/item")
