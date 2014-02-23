@@ -9,6 +9,7 @@ class Downloader:
         self.group = None
     def download(self):
         search = fanzub.search(self.group, self.anime, self.episode)
+        print "Found %s matches" % len(search)
         try:
             url = search[0].url
             name = search[0].name

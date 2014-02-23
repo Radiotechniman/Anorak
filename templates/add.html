@@ -1,24 +1,21 @@
 $def with (form, anime)
-$var title = "Add "+anime.titles['en'][0].title+" (" + anime.titles['x-jat'][0].title + ")"
+$var title = "Add "+createTitleListing(anime.titles)
 
-$if anime.titles.has_key('en'):
-	<h1>$anime.titles['en'][0].title ($anime.titles['x-jat'][0].title)</h1>
-$else:
-	$if anime.titles.has_key('x-jat'):
-		<h1>$anime.titles['x-jat'][0].title</h1>
-	$else:
-		<h1>Fail</h1>
+<h1>$createTitleListing(anime.titles)</h1>
 		
-
+<h4>Edit Info:</h4>
 <form action="" method="post">
 $:form.render()
 </form>
 
+<h4>Current Episode Listing:</h4>
 <table border="1" width="100%">
+    <thead>
     <tr>
-        <td>Episode</td>
-        <td>Title</td>
+        <th>Episode</th>
+        <th>Title</th>
     </tr>
+    </thead>
 $for i in xrange(anime.episodecount):
 	<tr>
         <td>$(i+1)</td>
@@ -28,4 +25,4 @@ $for i in xrange(anime.episodecount):
             <td>Episode $i</td>
 	</tr>
 </table>
-<!-- If we had access to subber groups from AniDB we would list them here in a table -->
+<!-- If we had access to subber groups from AniDB we would list them here in a table and provide easy selection -->

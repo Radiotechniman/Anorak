@@ -3,6 +3,8 @@ import shutil
 import model
 import regex
 import urlparse
+import notify
+import settings
 
 def processEpisode(dirName, nzbName=None):
     print dirName
@@ -13,6 +15,8 @@ def processEpisode(dirName, nzbName=None):
                 success = True
     if (success):
         shutil.rmtree(dirName)
+        if (settings.getSettings().get("Plex", "enabled")):
+            notify.update_plex()
     return success
 
             

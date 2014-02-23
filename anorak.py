@@ -8,7 +8,6 @@ import metadata
 import process
 import ConfigParser
 from downloader import *
-#setup database with sqlite3 anorak < schema.sql
 
 urls = (
 	'/', 'Index',
@@ -57,13 +56,16 @@ def setupConfig():
     if not settings.has_section("Anorak"):
         settings.add_section("Anorak")
         settings.add_section("SABnzbd")
+        settings.add_section("Plex")
         settings.set("Anorak", "port", 26463)
         settings.set("Anorak", "searchFrequency", 30)
-        settings.set("SABnzbd", "url", "http://localhost:8080/")
+        settings.set("SABnzbd", "url", "localhost:8080")
         settings.set("SABnzbd", "key", "")
         settings.set("SABnzbd", "category", "")
         settings.set("SABnzbd", "username", "")
         settings.set("SABnzbd", "password", "")
+        settings.set("Plex", "url", "localhost:32400")
+        settings.set("Plex", "enabled", False)
         file = open("anorak.cfg","w")
         settings.write(file)
         file.close()
@@ -115,8 +117,9 @@ class Anime:
             size=30,
             value=anime.location,
             description="Location"),
-            web.form.Textbox('alternativeTitle', web.form.notnull,
+            web.form.Textbox('alternativeTitle',
             size=30,
+            value=anime.alternativeTitle,
             description="Name override (for searching only)"),
             web.form.Hidden('form', value="editor"),
             web.form.Button('Update'),
@@ -126,8 +129,8 @@ class Anime:
         """ List anime episodes """
         anime = model.get_anime(id)
         episodes = model.get_episodes(id)
-        episodeForm = self.episodeForm
-        return render.anime(anime, episodes, episodeForm, self.editorForm(anime))
+        editorForm = self.editorForm(anime)
+        return render.anime(anime, episodes, self.episodeForm, editorForm)
         
     def POST(self, id):
         i = web.input()
@@ -154,9 +157,14 @@ class Anime:
             return "Couldn't snatch episode %s" % web.input().episode
 
     def POST_editor(self, id):
+        anime = model.get_anime(id)
+        episodes = model.get_episodes(id)
+        editorForm = self.editorForm(anime)
+        if not editorForm.validates():
+            return render.anime(anime,episodes,self.episodeForm,editorForm)
         model.update_anime_location(id, web.input().location)
         model.set_alternative_title_by_id(id, web.input().alternativeTitle)
-        raise web.seeother('/anime/%s' % id)
+        return render.anime(anime,episodes,self.episodeForm,editorForm)
         
 class Add:
     
@@ -164,6 +172,11 @@ class Add:
         web.form.Textbox('subber', web.form.notnull,
         size=30,
         description="Enter the release group"),
+
+        web.form.Textbox('location', web.form.notnull,
+        size=30,
+        description="Enter the file path for storing episodes"),
+
         web.form.Button('Complete Add'),
     )
     
@@ -180,7 +193,7 @@ class Add:
         anime = anidb.query(anidb.QUERY_ANIME, int(id))
         if not form.validates():
             return render.add(form, anime)
-        metadata.newAnime(anime)
+        metadata.newAnime(anime, form.d.subber, form.d.location)
         raise web.seeother('/anime/%s' % int(id))
         
 class Remove:
@@ -267,9 +280,24 @@ class Settings:
 
         web.form.Button('Update'),
     )
+
+    plexForm = web.form.Form(
+        web.form.Checkbox('enabled',
+        value=settings.get("Plex", "enabled"),
+        description="Plex Enabled:"),
+
+        web.form.Textbox('url', web.form.notnull,
+        size=30,
+        value=str(settings.get("Plex", "url")),
+        description="Plex URL:"),
+
+        web.form.Hidden('form', value="plex"),
+
+        web.form.Button('Update'),
+    )
     
     def GET(self):
-        return render.settings(self.settingsForm, self.sabnzbdForm)
+        return render.settings(self.settingsForm, self.sabnzbdForm, self.plexForm)
     
     def POST(self):
         i = web.input()
@@ -277,12 +305,14 @@ class Settings:
         # determine which form to process based on the hidden value "form"
         if i.form == "settings":
             return self.POST_settings()
-        else:
+        if i.form == "sabnzbd":
             return self.POST_sabnzbd()
+        if i.form == "plex":
+            return self.POST_plex()
 
     def POST_settings(self):
         if not self.settingsForm.validates():
-            return render.settings(self.settingsForm, self.sabnzbdForm)
+            return render.settings(self.settingsForm, self.sabnzbdForm, self.plexForm)
         settings.set("Anorak", "searchFrequency", self.settingsForm.d.searchFrequency)
         settings.set("Anorak", "port", self.settingsForm.d.port)
         file = open("anorak.cfg","w")
@@ -292,7 +322,7 @@ class Settings:
 
     def POST_sabnzbd(self):
         if not self.sabnzbdForm.validates():
-            return render.settings(self.settingsForm, self.sabnzbdForm)
+            return render.settings(self.settingsForm, self.sabnzbdForm, self.plexForm)
         settings.set("SABnzbd", "url", self.sabnzbdForm.d.url)
         settings.set("SABnzbd", "username", self.sabnzbdForm.d.username)
         settings.set("SABnzbd", "password", self.sabnzbdForm.d.password)
@@ -301,7 +331,17 @@ class Settings:
         file = open("anorak.cfg","w")
         settings.write(file)
         file.close()
-        return render.settings(self.settingsForm, self.sabnzbdForm)
+        return render.settings(self.settingsForm, self.sabnzbdForm, self.plexForm)
+
+    def POST_plex(self):
+        if not self.plexForm.validates():
+            return render.settings(self.settingsForm, self.sabnzbdForm, self.plexForm)
+        settings.set("Plex", "url", self.plexForm.d.url)
+        settings.set("Plex", "enabled", self.plexForm.d.enabled)
+        file = open("anorak.cfg","w")
+        settings.write(file)
+        file.close()
+        return render.settings(self.settingsForm, self.sabnzbdForm, self.plexForm)
 
 app = web.application(urls, globals())
 search = search.SearchThread()

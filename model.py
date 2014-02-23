@@ -23,8 +23,8 @@ def update_anime_location(id, location):
     db.update('animes', where='id=$id', vars=locals(),
               location=location)
 
-def new_anime(id, title, subber, quality=0):
-    db.insert('animes', id=id, title=title, subber=subber, quality=quality)
+def new_anime(id, title, subber, location, quality=0):
+    db.insert('animes', id=id, title=title, subber=subber, location=location, quality=quality)
     
 def remove_anime(id):
     db.delete('animes', where='id=$id', vars=locals())

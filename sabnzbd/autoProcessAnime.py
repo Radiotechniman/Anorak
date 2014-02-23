@@ -25,7 +25,7 @@ class AuthURLOpener(urllib.FancyURLopener):
 def processEpisode(dirName, nzbName=None):
 
     config = ConfigParser.ConfigParser()
-    configFilename = os.path.join(os.path.dirname(sys.argv[0]), "autoProcess.cfg")
+    configFilename = os.path.join(os.path.dirname(sys.argv[0]), "autoProcessAnime.cfg")
     print "Loading config from", configFilename
     
     if not os.path.isfile(configFilename):

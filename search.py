@@ -7,12 +7,13 @@ import metadata
 import datetime
 import random
 import ConfigParser
+import settings
 
 class SearchThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.downloader = Downloader()
-        self.getSettings()
+        self.settings = settings.getSettings()
         self.setMetadataRefreshDate()
 
     def setMetadataRefreshDate(self):
@@ -22,16 +23,6 @@ class SearchThread(threading.Thread):
         day = tomorrow.day
         hour = random.choice(range(1,24))
         self.date = datetime.datetime(year, month, day, hour)
-
-    # this function is for allowing the search thread to reload it's settings after it wakes in case the frequency changed
-    def getSettings(self):
-        self.settings = ConfigParser.ConfigParser()
-        try:
-            file = open("anorak.cfg", "r")
-            self.settings.readfp(file)
-            file.close()
-        except IOError, e:
-            print "Could not read configuration file: ", str(e)
 
     def run(self):
         while (True):
@@ -46,10 +37,11 @@ class SearchThread(threading.Thread):
             if refreshMetadata:
                 self.setMetadataRefreshDate()
             print "Anorak searcher thread resuming sleep\n"
-            # reload settings
-            self.getSettings()
+            # reload settings just in case the search frequency changed
+            self.settings = settings.getSettings()
             time.sleep(60*float(self.settings.get("Anorak", "searchFrequency")))
     def searchAnime(self, anime):
+        snatched = False
         print "Searching for newly aired anime in %s\n" % (anime.title)
         episodes = model.get_episodes(anime.id)
         for episode in episodes:
@@ -64,6 +56,6 @@ class SearchThread(threading.Thread):
                             self.downloader.anime = anime.alternativeTitle
                         if (self.downloader.download()):
                             model.snatched_episode(id, episode.episode)
-                            return "Snatched successfully"
-                        else:
-                            return "Couldn't snatch"
+                            print "Episode was successfully snatched"
+                            snatched = True
+        return snatched
