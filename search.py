@@ -55,7 +55,7 @@ class SearchThread(threading.Thread):
                         if anime.alternativeTitle != None and len(anime.alternativeTitle) > 0:
                             self.downloader.anime = anime.alternativeTitle
                         if (self.downloader.download()):
-                            model.snatched_episode(id, episode.episode)
+                            model.snatched_episode(anime.id, episode.episode)
                             print "Episode was successfully snatched"
                             snatched = True
         return snatched
