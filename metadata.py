@@ -2,8 +2,8 @@ import lib.anidb as anidb
 import datetime
 import model
 
-def newAnime(anime, subber, location):
-    model.new_anime(anime.id, anime.titles['x-jat'][0].title, subber, location, quality=0)
+def newAnime(anime, subber, location, quality):
+    model.new_anime(anime.id, anime.titles['x-jat'][0].title, subber, location, quality)
     for i in xrange(anime.episodecount):
         if anime.episodes.has_key(str(i+1)):
             # Prevent None type from being compared with a date

@@ -33,6 +33,7 @@ class SearchThread(threading.Thread):
                 # refresh anime metadata only once a day at a random hour (so we don't DDOS anidb)
                 if refreshMetadata:
                     metadata.refreshForAnime(anime.id)
+                    time.sleep(60) # Sleep for 60 seconds so we don't trigger flood protection and get a temporary ban
                 self.searchAnime(anime)
             if refreshMetadata:
                 self.setMetadataRefreshDate()
@@ -49,11 +50,8 @@ class SearchThread(threading.Thread):
                 if episode.airdate != None:
                     if episode.airdate < datetime.datetime.now():
                         print "Attempting to snatch episode %s" % episode.episode
-                        self.downloader.anime = anime.title
-                        self.downloader.group = anime.subber
+                        self.downloader.anime = anime
                         self.downloader.episode = episode.episode
-                        if anime.alternativeTitle != None and len(anime.alternativeTitle) > 0:
-                            self.downloader.anime = anime.alternativeTitle
                         if (self.downloader.download()):
                             model.snatched_episode(anime.id, episode.episode)
                             print "Episode was successfully snatched"

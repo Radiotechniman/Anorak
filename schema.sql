@@ -3,7 +3,7 @@ CREATE TABLE animes (
     title text,
     alternativeTitle text,
     subber text,
-    quality integer,
+    quality integer, /* 0, 480, 720, 1080 */
     location text
 );
 

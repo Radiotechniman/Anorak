@@ -1,6 +1,5 @@
 import os
 import re
-#use https://github.com/lad1337/Sick-Beard/blob/anime/sickbeard/name_parser/parser.py
 
 anime_ep_regexes = [
                     
@@ -173,6 +172,7 @@ anime_ep_regexes = [
                .*?                                                         # Separator and EOL
                ''')
                ]
+
 class NameParser(object):
     def __init__(self, file_name=True, regexMode=0):
         

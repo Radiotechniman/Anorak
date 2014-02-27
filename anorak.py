@@ -116,12 +116,25 @@ class Anime:
             web.form.Textbox('location', web.form.notnull,
             size=30,
             value=anime.location,
-            description="Location"),
+            description="Location:"),
+
             web.form.Textbox('alternativeTitle',
             size=30,
             value=anime.alternativeTitle,
-            description="Name override (for searching only)"),
+            description="Name override (for searching only):"),
+
+            web.form.Textbox('releaseGroup',
+            size=30,
+            value=anime.subber,
+            description="Release Group:"),
+
+            web.form.Dropdown('quality',
+            [(0, 'None'), (720, '720p'), (480, '480p'), (1080, '1080p')],
+            value=anime.quality,
+            description="Force a quality. Leave 'None' if your release group doesn't have more than one quality."),
+
             web.form.Hidden('form', value="editor"),
+
             web.form.Button('Update'),
         )
     
@@ -144,12 +157,8 @@ class Anime:
     def POST_snatch(self, id):
         anime = model.get_anime(id)
         downloader = Downloader()
-        downloader.anime = anime.title
-        downloader.group = anime.subber
+        downloader.anime = anime
         downloader.episode = web.input().episode
-        # check for x-jat title override
-        if anime.alternativeTitle != None and len(anime.alternativeTitle) > 0:
-            self.downloader.anime = anime.alternativeTitle
         if (downloader.download()):
             model.snatched_episode(id, web.input().episode)
             return "Snatched successfully"
@@ -162,13 +171,16 @@ class Anime:
         editorForm = self.editorForm(anime)
         if not editorForm.validates():
             return render.anime(anime,episodes,self.episodeForm,editorForm)
-        model.update_anime_location(id, web.input().location)
-        model.set_alternative_title_by_id(id, web.input().alternativeTitle)
+        model.update_anime(id, web.input().alternativeTitle, web.input().releaseGroup, web.input().location, int(web.input().quality))
         return render.anime(anime,episodes,self.episodeForm,editorForm)
         
 class Add:
     
     form = web.form.Form(
+        web.form.Dropdown('quality',
+        [(0, 'None'), (720, '720p'), (480, '480p'), (1080, '1080p')],
+        description="Force a quality. Leave 'None' if your release group doesn't have more than one quality."),
+
         web.form.Textbox('subber', web.form.notnull,
         size=30,
         description="Enter the release group"),
@@ -193,7 +205,7 @@ class Add:
         anime = anidb.query(anidb.QUERY_ANIME, int(id))
         if not form.validates():
             return render.add(form, anime)
-        metadata.newAnime(anime, form.d.subber, form.d.location)
+        metadata.newAnime(anime, form.d.subber, form.d.location, form.d.quality)
         raise web.seeother('/anime/%s' % int(id))
         
 class Remove:
