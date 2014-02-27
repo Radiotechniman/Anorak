@@ -1,13 +1,15 @@
 Anorak
 =====
 
-*Anorak is currently an alpha release. There may be severe bugs in it and at any given time it may not work at all.*
+*Anorak was designed for my personal usage. The features you want may not be present and it may contain bugs.*
 
-Anorak is a PVR for newsgroup users. It watches for new episodes of your favorite anime shows and when they are posted it downloads them, sorts and renames them. It currently supports fanzub.com and retrieves show information from aniDB.net.
+Anorak is an automated downloader for newsgroup users. It watches for new episodes of your favorite anime shows and when they are posted it downloads them, sorts and renames them. It currently supports fanzub.com and retrieves show information from aniDB.net.
 
 Notes:
 
 There's no auto-updating mechanism. It is planned and will come later.
+
+
 There is no management feature. This isn't planned at the moment.
 
 Features include:
@@ -32,7 +34,11 @@ To run Anorak from source you will need Python 2.7+. Hasn't been tested with Pyt
 
 ## Bugs
 Only tested on OS X and Safari.
+
+
 When a release uses 10bit or 8bit in the name it causes quality checking to fail.
+
+
 If you find a bug please report it or it'll never get fixed. Verify that it hasn't already been submitted and then log a new bug. Be sure to provide as much information as possible.
 
 [anidb]: https://github.com/mineo/pyanihttp
