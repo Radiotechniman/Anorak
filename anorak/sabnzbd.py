@@ -1,9 +1,7 @@
-import os, urllib, urllib2
-import datetime
+import urllib
 import httplib
 import ConfigParser
-import lib.web as web
-import model
+
 
 def SABnzbd(title=None, nzburl=None):
     settings = ConfigParser.ConfigParser()

@@ -1,8 +1,6 @@
-import fanzub
-import regex
 import re
-import model
-import sabnzbd
+from anorak import fanzub, regex, sabnzbd
+
 
 class Downloader:
     

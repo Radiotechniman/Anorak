@@ -1,10 +1,10 @@
 import os
 import shutil
+
+from anorak import notify, regex
 import model
-import regex
-import urlparse
-import notify
 import settings
+
 
 def processEpisode(dirName, nzbName=None):
     print dirName

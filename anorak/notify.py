@@ -1,7 +1,7 @@
-import ConfigParser
 import urllib
-import settings
 from xml.dom import minidom
+from anorak import settings
+
 
 def update_plex():
     _settings = settings.getSettings()

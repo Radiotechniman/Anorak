@@ -1,6 +1,8 @@
-import lib.anidb as anidb
 import datetime
-import model
+
+from anorak import model
+import lib.anidb as anidb
+
 
 def newAnime(anime, subber, location, quality):
     model.new_anime(anime.id, anime.titles['x-jat'][0].title, subber, location, quality)

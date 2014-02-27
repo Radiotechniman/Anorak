@@ -1,13 +1,11 @@
+import sys
+import datetime
+import ConfigParser
 import lib.web as web
 import lib.anidb as anidb
-import sys
-import model
-import datetime
-import search
-import metadata
-import process
-import ConfigParser
-from downloader import *
+from anorak.downloader import *
+from anorak import metadata, model, process, search
+
 
 urls = (
 	'/', 'Index',

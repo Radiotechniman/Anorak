@@ -1,13 +1,10 @@
-from downloader import *
-import datetime
 import threading
-import model
 import time
-import metadata
 import datetime
 import random
-import ConfigParser
-import settings
+from anorak import metadata, settings, model
+from anorak.downloader import *
+
 
 class SearchThread(threading.Thread):
     def __init__(self):
