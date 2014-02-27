@@ -31,7 +31,8 @@ Anorak makes use of the following projects:
 To run Anorak from source you will need Python 2.7+. Hasn't been tested with Python 3.
 
 ## Bugs
-
+Only tested on OS X and Safari.
+When a release uses 10bit or 8bit in the name it causes quality checking to fail.
 If you find a bug please report it or it'll never get fixed. Verify that it hasn't already been submitted and then log a new bug. Be sure to provide as much information as possible.
 
 [anidb]: https://github.com/mineo/pyanihttp

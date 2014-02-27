@@ -16,6 +16,7 @@ urls = (
 	'/remove/(\d+)', 'Remove',
     '/refresh/(\d+)', 'Refresh',
     '/process', 'Process',
+    '/shutdown', 'Shutdown'
 )
 
 searchForm = web.form.Form(
@@ -352,6 +353,10 @@ class Settings:
         settings.write(file)
         file.close()
         return render.settings(self.settingsForm, self.sabnzbdForm, self.plexForm)
+
+class Shutdown(object):
+    def GET(self):
+        sys.exit(0)
 
 app = web.application(urls, globals())
 search = search.SearchThread()
