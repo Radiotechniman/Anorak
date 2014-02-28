@@ -1,7 +1,6 @@
 import datetime
-
-from anorak import model
 import lib.anidb as anidb
+from anorak import model
 
 
 def newAnime(anime, subber, location, quality):

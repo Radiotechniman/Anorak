@@ -1,10 +1,6 @@
 import os
 import shutil
-
-from anorak import notify, regex
-import model
-import settings
-
+from anorak import notify, regex, model, settings
 
 def processEpisode(dirName, nzbName=None):
     print dirName

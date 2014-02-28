@@ -1,7 +1,6 @@
 import re
 from anorak import fanzub, regex, sabnzbd
 
-
 class Downloader:
     
     def __init__(self):

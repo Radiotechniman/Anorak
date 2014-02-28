@@ -6,17 +6,16 @@ import lib.anidb as anidb
 from anorak.downloader import *
 from anorak import metadata, model, process, search
 
-
 urls = (
 	'/', 'Index',
-    '/anime/(\d+)', 'Anime',
+	'/anime/(\d+)', 'Anime',
 	'/settings', 'Settings',
-    '/search', 'Search',
-    '/add/(\d+)', 'Add',
+	'/search', 'Search',
+	'/add/(\d+)', 'Add',
 	'/remove/(\d+)', 'Remove',
-    '/refresh/(\d+)', 'Refresh',
-    '/process', 'Process',
-    '/shutdown', 'Shutdown'
+	'/refresh/(\d+)', 'Refresh',
+	'/process', 'Process',
+	'/shutdown', 'Shutdown'
 )
 
 searchForm = web.form.Form(
@@ -128,8 +127,8 @@ class Anime:
             description="Release Group:"),
 
             web.form.Dropdown('quality',
-            [(0, 'None'), (720, '720p'), (480, '480p'), (1080, '1080p')],
-            value=anime.quality,
+            [('0', 'None'), ('720', '720p'), ('480', '480p'), ('1080', '1080p')],
+            value=str(anime.quality),
             description="Force a quality. Leave 'None' if your release group doesn't have more than one quality."),
 
             web.form.Hidden('form', value="editor"),
@@ -294,7 +293,7 @@ class Settings:
 
     plexForm = web.form.Form(
         web.form.Checkbox('enabled',
-        value=settings.get("Plex", "enabled"),
+        checked=settings.getboolean("Plex", "enabled"),
         description="Plex Enabled:"),
 
         web.form.Textbox('url', web.form.notnull,
@@ -362,6 +361,7 @@ app = web.application(urls, globals())
 search = search.SearchThread()
 
 if __name__ == '__main__':
-    sys.argv[1:] = [settings.get("Anorak", "port")]
+    port = settings.get("Anorak", "port")
+    sys.argv[1:] = [port]
     search.start()
     app.run()
