@@ -101,6 +101,7 @@ class Anime(Entity, Titled, Typed, Described):
         self._enddate = None
         self._categories = []
         self._tags = []
+        self._picture = None
         self._ratings = {
                     "permanent":
                     { "count": None, "rating": None},
@@ -155,6 +156,15 @@ class Anime(Entity, Titled, Typed, Described):
         :param tag: A :class:`anidb.model.Tag`
         """
         self._tags.append(tag)
+
+    @property
+    def picture(self):
+        """The picture property"""
+        return "http://img7.anidb.net/pics/anime/%s" % self._picture
+
+    @picture.setter
+    def picture(self, value):
+        self._picture = value
 
     @property
     def episodecount(self):

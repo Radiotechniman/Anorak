@@ -141,13 +141,23 @@ def parse_anime(anime):
             result.type = elem.text
         elif elem.tag == "startdate":
             # This doesn't work for anime that don't have a defined airdate yet. It crashes.
-            y, m, d = elem.text.split("-")
-            result.startdate = datetime.datetime(int(y), int(m), int(d))
+            try:
+                y, m, d = elem.text.split("-")
+                result.startdate = datetime.datetime(int(y), int(m), int(d))
+            except ValueError:
+                pass
         elif elem.tag == "enddate":
-            y, m, d = elem.text.split("-")
-            result.enddate = datetime.datetime(int(y), int(m), int(d))
+            try:
+                y, m, d = elem.text.split("-")
+                result.enddate = datetime.datetime(int(y), int(m), int(d))
+            except ValueError:
+                pass
         elif elem.tag == "episodecount":
             result.episodecount = elem.text
+        elif elem.tag == "picture":
+            result.picture = elem.text
+        elif elem.tag == "description":
+            result.description = elem.text
         elif elem.tag == "ratings":
             for r in elem:
                 result.set_rating(r.tag, r.attrib["count"], float(r.text))
@@ -189,8 +199,11 @@ def parse_episode(episode):
         if elem.tag == "length":
             ep.length = elem.text
         elif elem.tag == "airdate":
-            y, m, d = elem.text.split("-")
-            ep.airdate = datetime.datetime(int(y), int(m), int(d))
+            try:
+                y, m, d = elem.text.split("-")
+                ep.airdate = datetime.datetime(int(y), int(m), int(d))
+            except ValueError:
+                pass
         elif elem.tag == "rating":
             ep.set_rating(elem.attrib["votes"], elem.text)
         elif elem.tag == "title":
