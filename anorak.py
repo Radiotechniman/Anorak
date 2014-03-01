@@ -1,8 +1,10 @@
+import os
 import sys
 import datetime
 import ConfigParser
 import lib.web as web
 import lib.anidb as anidb
+from optparse import OptionParser
 from anorak.downloader import *
 from anorak import metadata, model, process, search
 
@@ -328,7 +330,7 @@ class Settings:
         file = open("anorak.cfg","w")
         settings.write(file)
         file.close()
-        return render.settings(self.settingsForm, self.sabnzbdForm)
+        return render.settings(self.settingsForm, self.sabnzbdForm, self.plexForm)
 
     def POST_sabnzbd(self):
         if not self.sabnzbdForm.validates():
@@ -355,13 +357,40 @@ class Settings:
 
 class Shutdown(object):
     def GET(self):
-        sys.exit(0)
+        os._exit(0)
+
+class NullDevice:
+    def write(self, s):
+        pass
+
+def daemonize():
+    """Become a daemon"""
+    if os.fork():
+        os._exit(0)
+
+    # decouple from parent environment
+    os.setsid()
+    os.umask(0)
+
+    sys.stdin.close()
+    sys.stdout = NullDevice()
+    sys.stderr = NullDevice()
+
 
 app = web.application(urls, globals())
 search = search.SearchThread()
 
 if __name__ == '__main__':
     port = settings.get("Anorak", "port")
+    optionParser = OptionParser()
+    optionParser.add_option('-d', '--daemon', action = "store_true",
+                 dest = 'daemon', help = "Run the server as a daemon")
+    options, args = optionParser.parse_args()
+    if options.daemon:
+        if not sys.platform == 'win32':
+            daemonize()
+        else:
+            print "Daemon mode not supported under Windows, starting normally."
     sys.argv[1:] = [port]
     search.start()
     app.run()
