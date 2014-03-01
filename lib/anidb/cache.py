@@ -1,12 +1,13 @@
 import cPickle as pickle
 import datetime
+import tempfile
 
 from os.path import join, isfile, isdir
 from os import mkdir
 
 __all__ = ["get", "save"]
 
-CACHEDIR = "/tmp/pyanihttp.cache"
+CACHEDIR = join(tempfile.gettempdir(), "pyanihttp.cache")
 
 def get(aid):
     if not isdir(CACHEDIR):
