@@ -4,7 +4,7 @@ import datetime
 db = web.database(dbn='sqlite', db='anorak.db')
 
 def get_animes():
-    return db.select('animes', order='title DESC')
+    return db.select('animes', order='title ASC')
     
 def get_anime(id):
     try:
